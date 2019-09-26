@@ -21,11 +21,13 @@ class App extends React.Component {
     modules: [],
     courses: [],
     selectedCourse: null,
-    apiKey: null,
+    apiKey: "",
     success: false,
     csvData: [],
     longNames: [],
-    error: null
+    error: null,
+    loading: false,
+    loadMessage: null
   };
 
   changeState = e => {
@@ -37,26 +39,43 @@ class App extends React.Component {
 
   requestCourses = async e => {
     e.preventDefault();
+    await this.setState({
+      loading: true
+    });
     const { apiKey } = this.state;
-    await axios({
-      method: "GET",
-      url: "/api/courses",
-      params: {
-        apiKey
-      }
-    })
-      .then(res => {
-        const courses = res.data.data;
-        this.setState({
-          courses
-        });
+    if (apiKey.length > 0) {
+      await axios({
+        method: "GET",
+        url: "/api/courses",
+        params: {
+          apiKey
+        }
       })
-      .catch(e => {
-        console.log(e);
+        .then(res => {
+          const courses = res.data.data;
+          this.setState({
+            courses,
+            loading: false,
+            error: null
+          });
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    } else {
+      this.setState({
+        error: `You did not provide an API key.`,
+        loading: false
       });
+    }
   };
 
   pullModules = async e => {
+    await this.setState({
+      success: false,
+      loading: true,
+      newModuleNames: []
+    });
     const courseId = e.value;
     const { apiKey } = this.state;
     await axios({
@@ -95,7 +114,8 @@ class App extends React.Component {
         this.setState({
           csvData,
           modules,
-          selectedCourse: courseId
+          selectedCourse: courseId,
+          loading: false
         });
       })
       .catch(e => {
@@ -112,9 +132,16 @@ class App extends React.Component {
     data.pop();
 
     data.forEach((value, index) => {
-      if (index > 0) {
-        const newName = value[1];
-        newModuleNames.push(newName);
+      const i = data[0].indexOf("New Name");
+      if (i > 0) {
+        if (index > 0) {
+          const newName = value[i];
+          newModuleNames.push(newName);
+        }
+      } else {
+        this.setState({
+          error: `You do not have a column named "New Name" in your CSV file.`
+        });
       }
     });
 
@@ -157,6 +184,12 @@ class App extends React.Component {
 
   submitNames = async e => {
     e.preventDefault();
+    await this.setState({
+      error: false,
+      success: false,
+      loading: true,
+      loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`
+    });
     let error = false;
     const {
       modules,
@@ -168,7 +201,7 @@ class App extends React.Component {
     async function putRequest() {
       for (let i = 0; i < modules.length; i++) {
         if (!error) {
-          modules[i].newTitle = newModuleNames[i];
+          modules[i].new_title = newModuleNames[i];
           console.log(modules[i]);
           await axios({
             method: "PUT",
@@ -188,18 +221,23 @@ class App extends React.Component {
               console.log(e);
               error = true;
             });
-          await delay(750);
+          await delay(1000);
         }
       }
     }
     await putRequest();
     if (!error) {
       this.setState({
-        success: true
+        success: true,
+        error: null,
+        loading: false,
+        modules: [],
+        newModuleNames: []
       });
     } else {
       this.setState({
-        error: `The request did not go through.`
+        error: `The request did not go through.`,
+        loading: false
       });
     }
   };
@@ -212,18 +250,21 @@ class App extends React.Component {
         </Helmet>
         <h1>Course Module Name Changer</h1>
         <form onSubmit={this.requestCourses}>
-          <label htmlFor="apiKey">
-            Input your API Key:
-            <input
-              type="text"
-              name="apiKey"
-              value={this.state.apiKey}
-              onChange={this.changeState}
-            />
-          </label>
-          <button type="submit">
-            <FontAwesomeIcon icon={faAngleDoubleDown} /> Get Courses
-          </button>
+          <fieldset aria-busy={this.state.loading}>
+            <label htmlFor="apiKey">
+              Input your API Key:
+              <input
+                type="text"
+                name="apiKey"
+                value={this.state.apiKey}
+                onChange={this.changeState}
+                disabled={this.state.courses.length > 0}
+              />
+            </label>
+            <button type="submit">
+              <FontAwesomeIcon icon={faAngleDoubleDown} /> Get Courses
+            </button>
+          </fieldset>
         </form>
         {this.state.courses.length > 0 && (
           <Select
@@ -236,6 +277,14 @@ class App extends React.Component {
             onChange={this.pullModules}
           />
         )}
+        {this.state.loading && (
+          <p>{this.state.loadMessage || `Loading, please wait.`}</p>
+        )}
+        {this.state.error && (
+          <p className="error">
+            <span>Error:</span> {this.state.error}
+          </p>
+        )}
         {this.state.csvData.length > 0 && (
           <p className="csv-download">
             Grab the CSV Data to format here:{" "}
@@ -246,15 +295,10 @@ class App extends React.Component {
         )}
         {this.state.modules.length > 0 && (
           <CSVReader
-            label="Upload CSV file."
+            label="Upload your CSV file with new names:"
             onFileLoaded={this.parseCSV}
             onError={this.handleError}
           />
-        )}
-        {this.state.error && (
-          <p className="error">
-            <span>Error:</span> {this.state.error}
-          </p>
         )}
         {this.state.longNames.length > 0 && (
           <ul>
@@ -275,37 +319,40 @@ class App extends React.Component {
             })}
           </div>
         )}
-        {this.state.modules.length > 0 && this.state.newModuleNames.length > 0 && (
-          <>
-            {!this.state.success ? (
-              <p>
-                Here are the modules. Please confirm that the names match up. If
-                they do not, or there are mistakes in the new name, please edit
-                your CSV file and resubmit it.
-              </p>
-            ) : (
-              <p className="success">
-                <span>Congratulations:</span> Module names successfully updated!
-              </p>
-            )}
-            <div className="grid-container">
-              <div className="grid-header">Old Name</div>
-              <div className="grid-header">New Name</div>
-              {this.state.modules.map((module, index) => {
-                return (
-                  <React.Fragment key={index}>
-                    <div>{module.title}</div>
-                    <div>{this.state.newModuleNames[index]}</div>
-                  </React.Fragment>
-                );
-              })}
-            </div>
-            <button onClick={this.submitNames}>
-              <FontAwesomeIcon icon={faSave} />
-              Submit Names
-            </button>
-          </>
+        {this.state.success && (
+          <p className="success">
+            <span>Congratulations:</span> Module names successfully updated!
+          </p>
         )}
+        {this.state.modules.length > 0 &&
+          this.state.newModuleNames.length > 0 &&
+          !this.state.loading && (
+            <>
+              {!this.state.success && (
+                <p>
+                  Here are the modules. Please confirm that the names match up.
+                  If they do not, or there are mistakes in the new name, please
+                  edit your CSV file and resubmit it.
+                </p>
+              )}
+              <div className="grid-container">
+                <div className="grid-header">Old Name</div>
+                <div className="grid-header">New Name</div>
+                {this.state.modules.map((module, index) => {
+                  return (
+                    <React.Fragment key={index}>
+                      <div>{module.title}</div>
+                      <div>{this.state.newModuleNames[index]}</div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+              <button onClick={this.submitNames}>
+                <FontAwesomeIcon icon={faSave} />
+                Submit Names
+              </button>
+            </>
+          )}
       </div>
     );
   }

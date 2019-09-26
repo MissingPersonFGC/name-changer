@@ -252,3 +252,36 @@ svg {
   grid-gap: 5px;
   margin-bottom: 30px;
 }
+
+@keyframes loading {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+fieldset::before {
+  height: 10px;
+  content: "";
+  display: block;
+  background-image: linear-gradient(to right, black 0%, white 50%, black 100%);
+  margin-bottom: 20px;
+}
+
+fieldset[aria-busy="true"]::before {
+  background-size: 50% auto;
+  animation: loading 0.5s linear infinite;
+}
+
+.error span {
+  font-weight: bold;
+  color: red;
+}
