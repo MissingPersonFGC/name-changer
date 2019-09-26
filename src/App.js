@@ -13,6 +13,7 @@ import {
   faDownload
 } from "@fortawesome/free-solid-svg-icons";
 import "./App.css";
+import { delay } from "q";
 
 class App extends React.Component {
   state = {
@@ -118,13 +119,11 @@ class App extends React.Component {
     });
 
     await newModuleNames.forEach((name, index) => {
-      if (name.length > 50) {
+      if (name.length > 50 && name.indexOf("Study Guide") < 0) {
         if (
           this.state.modules[index].type === "Assignment" ||
           this.state.modules[index].type === "Quiz" ||
-          this.state.modules[index].type === "Test" ||
-          this.state.modules[index].type === "Project" ||
-          this.state.modules[index].type === "Classwork"
+          this.state.modules[index].type === "Discussion"
         ) {
           error = true;
           message = `The following item names are too long. Please shorten them to 50 characters or less:`;
@@ -158,43 +157,50 @@ class App extends React.Component {
 
   submitNames = async e => {
     e.preventDefault();
-    let error = null;
+    let error = false;
     const {
       modules,
       apiKey,
       newModuleNames,
       selectedCourse: courseId
     } = this.state;
-    await modules.forEach(async (module, index) => {
-      if (newModuleNames[index] !== "") {
-        module.new_title = newModuleNames[index];
-        console.log(module);
-        await axios({
-          method: "PUT",
-          url: encodeURI(`/api/item`),
-          params: {
-            apiKey,
-            newTitle: module.new_title,
-            moduleId: module.module_id,
-            itemId: module.id,
-            courseId
-          }
-        })
-          .then(res => {
-            console.log(res);
+
+    async function putRequest() {
+      for (let i = 0; i < modules.length; i++) {
+        if (!error) {
+          modules[i].newTitle = newModuleNames[i];
+          console.log(modules[i]);
+          await axios({
+            method: "PUT",
+            url: encodeURI(`/api/item`),
+            params: {
+              apiKey,
+              newTitle: modules[i].new_title,
+              moduleId: modules[i].module_id,
+              itemId: modules[i].id,
+              courseId
+            }
           })
-          .catch(e => {
-            console.log(e);
-            return;
-          });
+            .then(res => {
+              console.log(res);
+            })
+            .catch(e => {
+              console.log(e);
+              error = true;
+            });
+          await delay(600);
+        }
       }
-    });
-    if (error === null) {
+    }
+    await putRequest();
+    if (!error) {
       this.setState({
         success: true
       });
     } else {
-      return;
+      this.setState({
+        error: `The request did not go through.`
+      });
     }
   };
 
