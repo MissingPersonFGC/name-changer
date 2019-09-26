@@ -9,7 +9,7 @@ router.route("/").put(async (req, res) => {
     itemId,
     moduleId,
     newTitle: title
-  } = req.query;
+  } = req.body;
   try {
     await axios({
       method: "PUT",

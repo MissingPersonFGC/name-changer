@@ -173,7 +173,7 @@ class App extends React.Component {
           await axios({
             method: "PUT",
             url: encodeURI(`/api/item`),
-            params: {
+            data: {
               apiKey,
               newTitle: modules[i].new_title,
               moduleId: modules[i].module_id,
@@ -188,7 +188,7 @@ class App extends React.Component {
               console.log(e);
               error = true;
             });
-          await delay(600);
+          await delay(750);
         }
       }
     }
