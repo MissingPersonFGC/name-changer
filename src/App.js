@@ -1,5 +1,4 @@
 // TODO: use CTA to explain app usage
-// TODO: add error handling if module array length does not match new name array length
 // TODO: see if you can query for only published module items
 // TODO: add module titles to items for importing into CSV
 
@@ -108,6 +107,7 @@ class App extends React.Component {
   parseCSV = async data => {
     const newModuleNames = [];
     let error = false;
+    let message = null;
     const longNames = [];
 
     data.pop();
@@ -129,10 +129,20 @@ class App extends React.Component {
           this.state.modules[index].type === "Classwork"
         ) {
           error = true;
+          message = `The following item names are too long. Please shorten them to 50 characters or less:`;
           longNames.push(name);
         }
       }
     });
+
+    if (newModuleNames.length !== this.state.modules.length) {
+      error = true;
+      if (newModuleNames.length > this.state.modules.length) {
+        message = `You have more items you want to rename than you have in your course modules.`;
+      } else {
+        message = `You have less items you want to rename than you have in your course modules.`;
+      }
+    }
 
     if (!error) {
       this.setState({
@@ -142,7 +152,7 @@ class App extends React.Component {
       });
     } else {
       this.setState({
-        error: `The following item names are too long. Please shorten them to 50 characters or less:`,
+        error: message,
         longNames
       });
     }
