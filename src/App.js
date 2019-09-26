@@ -49,7 +49,6 @@ class App extends React.Component {
     })
       .then(res => {
         const courses = res.data.data;
-        console.log(courses);
         this.setState({
           courses
         });
@@ -61,7 +60,6 @@ class App extends React.Component {
 
   pullModules = async e => {
     const courseId = e.value;
-    console.log(courseId);
     const { apiKey } = this.state;
     await axios({
       method: "GET",
@@ -138,7 +136,9 @@ class App extends React.Component {
 
     if (!error) {
       this.setState({
-        newModuleNames
+        newModuleNames,
+        error: null,
+        longNames: []
       });
     } else {
       this.setState({
