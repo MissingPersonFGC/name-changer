@@ -1,6 +1,4 @@
 // TODO: use CTA to explain app usage
-// TODO: see if you can query for only published module items
-// TODO: add module titles to items for importing into CSV
 
 import React from "react";
 import axios from "axios";
@@ -83,15 +81,15 @@ class App extends React.Component {
 
         json.forEach(module => {
           module.items.forEach(item => {
-            // item.module_id = module.id;
+            item.module_name = module.name;
             modules.push(item);
           });
         });
 
-        const csvData = [["Old Name", "New Name"]];
+        const csvData = [["Old Name", "Module Name", "New Name"]];
 
         modules.forEach(module => {
-          csvData.push([module.title]);
+          csvData.push([module.title, module.module_name]);
         });
         this.setState({
           csvData,
