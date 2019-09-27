@@ -129,46 +129,80 @@ class App extends React.Component {
     let message = null;
     const longNames = [];
 
+    await this.setState({
+      error: null,
+      longNames: []
+    });
+
     data.pop();
 
-    data.forEach((value, index) => {
+    await data.forEach((value, index) => {
       const i = data[0].indexOf("New Name");
       if (i > 0) {
         if (index > 0) {
           const newName = value[i];
-          newModuleNames.push(newName);
+          const oldName = value[data[0].indexOf("Old Name")];
+          const oldNameIndex = this.state.modules.findIndex(
+            module => module.title === oldName
+          );
+          if (oldNameIndex === index - 1) {
+            newModuleNames.push(newName);
+          } else {
+            error = true;
+            message = `The items in your CSV file are not in the same order as the modules. This will cause the new names to be incorrect. Please download the CSV file for this course above, and use this as the template for renaming.`;
+            this.setState({
+              error: message,
+              loading: false
+            });
+            return;
+          }
         }
       } else {
         this.setState({
           error: `You do not have a column named "New Name" in your CSV file.`
         });
+        return;
       }
     });
 
-    await newModuleNames.forEach((name, index) => {
-      if (name.length > 50 && name.indexOf("Study Guide") < 0) {
-        if (
-          this.state.modules[index].type === "Assignment" ||
-          this.state.modules[index].type === "Quiz" ||
-          this.state.modules[index].type === "Discussion"
-        ) {
-          error = true;
-          message = `The following item names are too long. Please shorten them to 50 characters or less:`;
-          longNames.push(name);
+    if (!error) {
+      await newModuleNames.forEach((name, index) => {
+        if (name.length > 50 && name.indexOf("Study Guide") < 0) {
+          if (
+            this.state.modules[index].type === "Assignment" ||
+            this.state.modules[index].type === "Quiz" ||
+            this.state.modules[index].type === "Discussion"
+          ) {
+            error = true;
+            message = `The following item names are too long. Please shorten them to 50 characters or less:`;
+            longNames.push(name);
+          }
         }
-      }
-    });
-
-    if (newModuleNames.length !== this.state.modules.length) {
-      error = true;
-      if (newModuleNames.length > this.state.modules.length) {
-        message = `You have more items you want to rename than you have in your course modules.`;
-      } else {
-        message = `You have less items you want to rename than you have in your course modules.`;
-      }
+      });
     }
 
     if (!error) {
+      if (newModuleNames.length !== this.state.modules.length) {
+        error = true;
+        if (newModuleNames.length > this.state.modules.length) {
+          message = `You have more items you want to rename than you have in your course modules.`;
+          this.setState({
+            error: message,
+            longNames: []
+          });
+          return;
+        } else {
+          message = `You have less items you want to rename than you have in your course modules.`;
+          this.setState({
+            error: message,
+            longNames: []
+          });
+          return;
+        }
+      }
+    }
+
+    if (!error && longNames.length === 0) {
       this.setState({
         newModuleNames,
         error: null,
@@ -203,24 +237,26 @@ class App extends React.Component {
         if (!error) {
           modules[i].new_title = newModuleNames[i];
           console.log(modules[i]);
-          await axios({
-            method: "PUT",
-            url: encodeURI(`/api/item`),
-            data: {
-              apiKey,
-              newTitle: modules[i].new_title,
-              moduleId: modules[i].module_id,
+          if (modules[i].new_title.length > 0) {
+            await axios({
+              method: "PUT",
+              url: encodeURI(`/api/item`),
+              data: {
+                apiKey,
+                newTitle: modules[i].new_title,
+                moduleId: modules[i].module_id,
               itemId: modules[i].id,
               courseId
-            }
-          })
-            .then(res => {
-              console.log(res);
+              }
             })
-            .catch(e => {
-              console.log(e);
-              error = true;
-            });
+              .then(res => {
+                console.log(res);
+              })
+              .catch(e => {
+                console.log(e);
+                error = true;
+              });
+          }
           await delay(1000);
         }
       }
