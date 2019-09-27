@@ -142,8 +142,10 @@ class App extends React.Component {
         if (index > 0) {
           const newName = value[i];
           const oldName = value[data[0].indexOf("Old Name")];
+          const moduleName = value[data[0].indexOf("Module Name")];
           const oldNameIndex = this.state.modules.findIndex(
-            module => module.title === oldName
+            module =>
+              module.title === oldName && module.module_name === moduleName
           );
           if (oldNameIndex === index - 1) {
             newModuleNames.push(newName);
@@ -245,8 +247,8 @@ class App extends React.Component {
                 apiKey,
                 newTitle: modules[i].new_title,
                 moduleId: modules[i].module_id,
-              itemId: modules[i].id,
-              courseId
+                itemId: modules[i].id,
+                courseId
               }
             })
               .then(res => {
