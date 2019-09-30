@@ -42,7 +42,8 @@ class App extends React.Component {
     await this.setState({
       loading: true
     });
-    const { apiKey } = this.state;
+    let { apiKey } = this.state;
+    apiKey.replace(" ", "");
     if (apiKey.length > 0) {
       await axios({
         method: "GET",
