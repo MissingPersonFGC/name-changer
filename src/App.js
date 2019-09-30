@@ -59,6 +59,11 @@ class App extends React.Component {
             loading: false,
             error: null
           });
+          if (courses.length === 0) {
+            this.setState({
+              error: `You do not have any courses to display!`
+            });
+          }
         })
         .catch(e => {
           console.log(e);
