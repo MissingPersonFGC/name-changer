@@ -151,7 +151,9 @@ class App extends React.Component {
           const moduleName = value[data[0].indexOf("Module Name")];
           const oldNameIndex = this.state.modules.findIndex(
             module =>
-              module.title === oldName && module.module_name === moduleName
+              module.title === oldName &&
+              module.module_name === moduleName &&
+              oldName.length === module.module_name.length
           );
           if (oldNameIndex === index - 1) {
             newModuleNames.push(newName);
