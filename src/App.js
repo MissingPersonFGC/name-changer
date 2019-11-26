@@ -141,32 +141,42 @@ class App extends React.Component {
     });
 
     data.pop();
+    const i = data[0].indexOf("New Name");
+    const iOld = data[0].indexOf("Old Name");
+    const iModule = data[0].indexOf("Module Name");
+
+    data.shift();
 
     await data.forEach((value, index) => {
-      const i = data[0].indexOf("New Name");
-      if (i > 0) {
-        if (index > 0) {
-          const newName = value[i];
-          const oldName = value[data[0].indexOf("Old Name")];
-          const moduleName = value[data[0].indexOf("Module Name")];
-          const oldNameIndex = this.state.modules.findIndex(
-            module =>
-              module.title === oldName &&
-              module.module_name === moduleName &&
-              oldName.length === module.module_name.length
-          );
-          if (oldNameIndex === index - 1) {
-            newModuleNames.push(newName);
-          } else {
-            error = true;
-            message = `The items in your CSV file are not in the same order as the modules. This will cause the new names to be incorrect. Please download the CSV file for this course above, and use this as the template for renaming.`;
-            this.setState({
-              error: message,
-              loading: false
-            });
-            return;
-          }
+      if (i >= 0) {
+        const newName = value[i];
+        const oldName = value[iOld];
+        const moduleName = value[iModule];
+
+        // check the index of the old name in the state
+        // if the csv data index is greater than the length of the of new name array, push it.
+        // if it is not, splice it to the proper index.
+
+        const oldNameIndex = this.state.modules.findIndex(
+          module =>
+            module.title === oldName && module.module_name === moduleName
+        );
+        if (oldNameIndex > newModuleNames.length - 1) {
+          newModuleNames.push(newName);
+        } else {
+          newModuleNames.splice(oldNameIndex, 0, newName);
         }
+        // if (oldNameIndex === index - 1) {
+        //   newModuleNames.push(newName);
+        // } else {
+        //   error = true;
+        //   message = `The items in your CSV file are not in the same order as the modules. This will cause the new names to be incorrect. Please download the CSV file for this course above, and use this as the template for renaming.`;
+        //   this.setState({
+        //     error: message,
+        //     loading: false
+        //   });
+        //   return;
+        // }
       } else {
         this.setState({
           error: `You do not have a column named "New Name" in your CSV file.`
@@ -174,6 +184,8 @@ class App extends React.Component {
         return;
       }
     });
+
+    console.log(newModuleNames, this.state.modules);
 
     if (!error) {
       await newModuleNames.forEach((name, index) => {
@@ -331,6 +343,11 @@ class App extends React.Component {
             <span>Error:</span> {this.state.error}
           </p>
         )}
+        {this.state.csvData.length === 0 &&
+          this.state.apiKey !== "" &&
+          this.state.selectedCourse && (
+            <p>There are no modules in this course.</p>
+          )}
         {this.state.csvData.length > 0 && (
           <p className="csv-download">
             Grab the CSV Data to format here:{" "}
