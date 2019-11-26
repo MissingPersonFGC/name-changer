@@ -147,16 +147,11 @@ class App extends React.Component {
 
     data.shift();
 
-    await data.forEach((value, index) => {
+    await data.forEach(value => {
       if (i >= 0) {
         const newName = value[i];
         const oldName = value[iOld];
         const moduleName = value[iModule];
-
-        // check the index of the old name in the state
-        // if the csv data index is greater than the length of the of new name array, push it.
-        // if it is not, splice it to the proper index.
-
         const oldNameIndex = this.state.modules.findIndex(
           module =>
             module.title === oldName && module.module_name === moduleName
@@ -166,17 +161,6 @@ class App extends React.Component {
         } else {
           newModuleNames.splice(oldNameIndex, 0, newName);
         }
-        // if (oldNameIndex === index - 1) {
-        //   newModuleNames.push(newName);
-        // } else {
-        //   error = true;
-        //   message = `The items in your CSV file are not in the same order as the modules. This will cause the new names to be incorrect. Please download the CSV file for this course above, and use this as the template for renaming.`;
-        //   this.setState({
-        //     error: message,
-        //     loading: false
-        //   });
-        //   return;
-        // }
       } else {
         this.setState({
           error: `You do not have a column named "New Name" in your CSV file.`
@@ -184,8 +168,6 @@ class App extends React.Component {
         return;
       }
     });
-
-    console.log(newModuleNames, this.state.modules);
 
     if (!error) {
       await newModuleNames.forEach((name, index) => {
