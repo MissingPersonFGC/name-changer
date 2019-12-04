@@ -112,10 +112,24 @@ class App extends React.Component {
           });
         });
 
-        const csvData = [["Old Name", "Module Name", "Position", "New Name"]];
+        const csvData = [
+          [
+            "Old Name",
+            "Module Name",
+            "Position",
+            "Type",
+            "New Name",
+            "Character Count"
+          ]
+        ];
 
         modules.forEach(module => {
-          csvData.push([module.title, module.module_name, module.position]);
+          csvData.push([
+            module.title,
+            module.module_name,
+            module.position,
+            module.type
+          ]);
         });
         this.setState({
           csvData,
@@ -350,7 +364,11 @@ class App extends React.Component {
               (Do NOT modify the "Module Name" or "Position" columns!)
             </span>
             :{" "}
-            <CSVLink data={this.state.csvData}>
+            <CSVLink
+              data={this.state.csvData}
+              separator={";"}
+              enclosingCharacter={`'`}
+            >
               <FontAwesomeIcon icon={faDownload} /> Download
             </CSVLink>
           </p>
