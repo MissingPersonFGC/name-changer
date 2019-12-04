@@ -285,3 +285,8 @@ fieldset[aria-busy="true"]::before {
   font-weight: bold;
   color: red;
 }
+
+.course-id span {
+  font-weight: bold;
+  margin-right: 10px;
+}

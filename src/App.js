@@ -317,6 +317,12 @@ class App extends React.Component {
             onChange={this.pullModules}
           />
         )}
+        {this.state.selectedCourse && (
+          <p className="course-id">
+            <span>Here's the course ID. Copy and paste it if needed:</span>
+            {this.state.selectedCourse}
+          </p>
+        )}
         {this.state.loading && (
           <p>{this.state.loadMessage || `Loading, please wait.`}</p>
         )}
