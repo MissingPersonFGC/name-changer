@@ -281,7 +281,8 @@ fieldset[aria-busy="true"]::before {
   animation: loading 0.5s linear infinite;
 }
 
-.error span {
+.error span,
+.csv-download span {
   font-weight: bold;
   color: red;
 }

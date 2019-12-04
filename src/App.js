@@ -112,10 +112,10 @@ class App extends React.Component {
           });
         });
 
-        const csvData = [["Old Name", "Module Name", "New Name"]];
+        const csvData = [["Old Name", "Module Name", "Position", "New Name"]];
 
         modules.forEach(module => {
-          csvData.push([module.title, module.module_name]);
+          csvData.push([module.title, module.module_name, module.position]);
         });
         this.setState({
           csvData,
@@ -144,19 +144,26 @@ class App extends React.Component {
     const i = data[0].indexOf("New Name");
     const iOld = data[0].indexOf("Old Name");
     const iModule = data[0].indexOf("Module Name");
+    const iPosition = data[0].indexOf("Position");
 
     data.shift();
 
     await data.forEach(value => {
       if (i >= 0) {
         const newName = value[i];
+        console.log(newName);
         const oldName = value[iOld];
         const moduleName = value[iModule];
+        const position = Number(value[iPosition]);
         const oldNameIndex = this.state.modules.findIndex(
           module =>
-            module.title === oldName && module.module_name === moduleName
+            module.title === oldName &&
+            module.module_name === moduleName &&
+            module.position === position
         );
-        if (oldNameIndex > newModuleNames.length - 1) {
+        if (newModuleNames.length === 0) {
+          newModuleNames.unshift(newName);
+        } else if (oldNameIndex > newModuleNames.length - 1) {
           newModuleNames.push(newName);
         } else {
           newModuleNames.splice(oldNameIndex, 0, newName);
@@ -338,7 +345,11 @@ class App extends React.Component {
           )}
         {this.state.csvData.length > 0 && (
           <p className="csv-download">
-            Grab the CSV Data to format here:{" "}
+            Grab the CSV Data to format here{" "}
+            <span>
+              (Do NOT modify the "Module Name" or "Position" columns!)
+            </span>
+            :{" "}
             <CSVLink data={this.state.csvData}>
               <FontAwesomeIcon icon={faDownload} /> Download
             </CSVLink>
