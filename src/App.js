@@ -4,14 +4,8 @@ import React from "react";
 import axios from "axios";
 import Select from "react-select";
 import Helmet from "react-helmet";
-import CSVReader from "react-csv-reader";
-import { CSVLink } from "react-csv";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAngleDoubleDown,
-  faSave,
-  faDownload
-} from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import "./App.css";
 import { delay } from "q";
 
@@ -32,8 +26,18 @@ class App extends React.Component {
 
   changeState = e => {
     const { value, name } = e.target;
+    console.log(name);
     this.setState({
       [name]: value
+    });
+  };
+
+  changeTitle = e => {
+    const { name: index, value } = e.target;
+    const { modules } = this.state;
+    modules[index].new_title = value;
+    this.setState({
+      modules
     });
   };
 
@@ -104,35 +108,35 @@ class App extends React.Component {
         if (resourcesIndex !== -1) {
           json.splice(resourcesIndex, 1);
         }
+        const teacherIndex = json.findIndex(
+          module =>
+            module.name ===
+            "Teacher Resources: How to teach and implement an eDL course successfully"
+        );
 
-        json.forEach(module => {
+        if (teacherIndex !== -1) {
+          json.splice(teacherIndex, 1);
+        }
+
+        const introIndex = json.findIndex(
+          module => module.name === "Getting Started: For students"
+        );
+        if (introIndex !== -1) {
+          json.splice(introIndex, 1);
+        }
+
+        json.forEach((module, index) => {
+          if (module.position - index > 1) {
+            module.position = module.position - (module.position - index - 1);
+          }
+
           module.items.forEach(item => {
             item.module_name = module.name;
+            item.new_title = `${module.position}.${item.position} - ${item.title}`;
             modules.push(item);
           });
         });
-
-        const csvData = [
-          [
-            "Old Name",
-            "Module Name",
-            "Position",
-            "Type",
-            "New Name",
-            "Character Count"
-          ]
-        ];
-
-        modules.forEach(module => {
-          csvData.push([
-            module.title,
-            module.module_name,
-            module.position,
-            module.type
-          ]);
-        });
         this.setState({
-          csvData,
           modules,
           selectedCourse: courseId,
           loading: false
@@ -143,162 +147,76 @@ class App extends React.Component {
       });
   };
 
-  parseCSV = async data => {
-    const newModuleNames = [];
-    let error = false;
-    let message = null;
-    const longNames = [];
-
-    await this.setState({
-      error: null,
-      longNames: []
-    });
-
-    data.pop();
-    const i = data[0].indexOf("New Name");
-    const iOld = data[0].indexOf("Old Name");
-    const iModule = data[0].indexOf("Module Name");
-    const iPosition = data[0].indexOf("Position");
-
-    data.shift();
-
-    await data.forEach(value => {
-      if (i >= 0) {
-        const newName = value[i];
-        console.log(newName);
-        const oldName = value[iOld];
-        const moduleName = value[iModule];
-        const position = Number(value[iPosition]);
-        const oldNameIndex = this.state.modules.findIndex(
-          module =>
-            module.title === oldName &&
-            module.module_name === moduleName &&
-            module.position === position
-        );
-        if (newModuleNames.length === 0) {
-          newModuleNames.unshift(newName);
-        } else if (oldNameIndex > newModuleNames.length - 1) {
-          newModuleNames.push(newName);
-        } else {
-          newModuleNames.splice(oldNameIndex, 0, newName);
-        }
-      } else {
-        this.setState({
-          error: `You do not have a column named "New Name" in your CSV file.`
-        });
-        return;
-      }
-    });
-
-    if (!error) {
-      await newModuleNames.forEach((name, index) => {
-        if (name.length > 50 && name.indexOf("Study Guide") < 0) {
-          if (
-            this.state.modules[index].type === "Assignment" ||
-            this.state.modules[index].type === "Quiz" ||
-            this.state.modules[index].type === "Discussion"
-          ) {
-            error = true;
-            message = `The following item names are too long. Please shorten them to 50 characters or less:`;
-            longNames.push(name);
-          }
-        }
-      });
-    }
-
-    if (!error) {
-      if (newModuleNames.length !== this.state.modules.length) {
-        error = true;
-        if (newModuleNames.length > this.state.modules.length) {
-          message = `You have more items you want to rename than you have in your course modules.`;
-          this.setState({
-            error: message,
-            longNames: []
-          });
-          return;
-        } else {
-          message = `You have less items you want to rename than you have in your course modules.`;
-          this.setState({
-            error: message,
-            longNames: []
-          });
-          return;
-        }
-      }
-    }
-
-    if (!error && longNames.length === 0) {
-      this.setState({
-        newModuleNames,
-        error: null,
-        longNames: []
-      });
-    } else {
-      this.setState({
-        error: message,
-        longNames
-      });
-    }
-  };
-
   submitNames = async e => {
     e.preventDefault();
-    await this.setState({
-      error: false,
-      success: false,
-      loading: true,
-      loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`
-    });
-    let error = false;
-    const {
-      modules,
-      apiKey,
-      newModuleNames,
-      selectedCourse: courseId
-    } = this.state;
-
-    async function putRequest() {
-      for (let i = 0; i < modules.length; i++) {
-        if (!error) {
-          modules[i].new_title = newModuleNames[i];
-          console.log(modules[i]);
-          if (modules[i].new_title.length > 0) {
-            await axios({
-              method: "PUT",
-              url: encodeURI(`/api/item`),
-              data: {
-                apiKey,
-                newTitle: modules[i].new_title,
-                moduleId: modules[i].module_id,
-                itemId: modules[i].id,
-                courseId
-              }
-            })
-              .then(res => {
-                console.log(res);
-              })
-              .catch(e => {
-                console.log(e);
-                error = true;
-              });
-          }
-          await delay(1000);
+    const { modules, apiKey, selectedCourse: courseId } = this.state;
+    // Start long name check.
+    const longNames = [];
+    await modules.forEach(module => {
+      if (module.new_title.length > 50) {
+        if (
+          module.type === "Assignment" ||
+          module.type === "Quiz" ||
+          module.type === "Discussion"
+        ) {
+          longNames.push(module.new_title);
         }
       }
-    }
-    await putRequest();
-    if (!error) {
-      this.setState({
-        success: true,
-        error: null,
-        loading: false,
-        modules: [],
-        newModuleNames: []
+    });
+    if (longNames.length === 0) {
+      await this.setState({
+        error: false,
+        success: false,
+        loading: true,
+        loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`
       });
+      let error = false;
+
+      async function putRequest() {
+        for (let i = 0; i < modules.length; i++) {
+          if (!error) {
+            if (modules[i].new_title.length > 0) {
+              await axios({
+                method: "PUT",
+                url: encodeURI(`/api/item`),
+                data: {
+                  apiKey,
+                  newTitle: modules[i].new_title,
+                  moduleId: modules[i].module_id,
+                  itemId: modules[i].id,
+                  courseId
+                }
+              })
+                .then(res => {
+                  console.log(res);
+                })
+                .catch(e => {
+                  error = true;
+                });
+            }
+            await delay(1000);
+          }
+        }
+      }
+      await putRequest();
+      if (!error) {
+        this.setState({
+          success: true,
+          error: null,
+          loading: false,
+          modules: [],
+          newModuleNames: []
+        });
+      } else {
+        this.setState({
+          error: `The request did not go through.`,
+          loading: false
+        });
+      }
     } else {
       this.setState({
-        error: `The request did not go through.`,
-        loading: false
+        error: `Some names are too long. Please correct the following names:`,
+        longNames
       });
     }
   };
@@ -348,55 +266,19 @@ class App extends React.Component {
           <p>{this.state.loadMessage || `Loading, please wait.`}</p>
         )}
         {this.state.error && (
-          <p className="error">
-            <span>Error:</span> {this.state.error}
-          </p>
-        )}
-        {this.state.csvData.length === 0 &&
-          this.state.apiKey !== "" &&
-          this.state.selectedCourse && (
-            <p>There are no modules in this course.</p>
-          )}
-        {this.state.csvData.length > 0 && (
-          <p className="csv-download">
-            Grab the CSV Data to format here{" "}
-            <span>
-              (Do NOT modify the "Module Name" or "Position" columns!)
-            </span>
-            :{" "}
-            <CSVLink
-              data={this.state.csvData}
-              separator={";"}
-              enclosingCharacter={`'`}
-            >
-              <FontAwesomeIcon icon={faDownload} /> Download
-            </CSVLink>
-          </p>
-        )}
-        {this.state.modules.length > 0 && (
-          <CSVReader
-            label="Upload your CSV file with new names:"
-            onFileLoaded={this.parseCSV}
-            onError={this.handleError}
-          />
-        )}
-        {this.state.longNames.length > 0 && (
-          <ul>
-            {this.state.longNames.map((name, index) => {
-              return (
-                <li key={index}>
-                  {name} ({name.length} characters)
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {this.state.modules.length > 0 && this.state.newModuleNames.length < 1 && (
-          <div className="course-name-container">
-            <div className="grid-header">Old Name</div>
-            {this.state.modules.map((module, index) => {
-              return <div key={index}>{module.title}</div>;
-            })}
+          <div className="error-container">
+            <p className="error">
+              <span>Error:</span> {this.state.error}
+            </p>
+            {this.state.longNames.length > 0 && (
+              <ul>
+                {this.state.longNames.map(name => (
+                  <li>
+                    {name} ({name.length} characters)
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
         {this.state.success && (
@@ -404,35 +286,56 @@ class App extends React.Component {
             <span>Congratulations:</span> Module names successfully updated!
           </p>
         )}
-        {this.state.modules.length > 0 &&
-          this.state.newModuleNames.length > 0 &&
-          !this.state.loading && (
-            <>
-              {!this.state.success && (
-                <p>
-                  Here are the modules. Please confirm that the names match up.
-                  If they do not, or there are mistakes in the new name, please
-                  edit your CSV file and resubmit it.
-                </p>
-              )}
-              <div className="grid-container">
-                <div className="grid-header">Old Name</div>
-                <div className="grid-header">New Name</div>
-                {this.state.modules.map((module, index) => {
-                  return (
-                    <React.Fragment key={index}>
-                      <div>{module.title}</div>
-                      <div>{this.state.newModuleNames[index]}</div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-              <button onClick={this.submitNames}>
-                <FontAwesomeIcon icon={faSave} />
-                Submit Names
-              </button>
-            </>
-          )}
+        {this.state.modules.length > 0 && (
+          <>
+            <p>
+              Here are the items with new names, please check them and change
+              manually if necessary. Any assignment, quiz, or discussion with
+              over 50 characters in the title MUST be renamed.
+            </p>
+            <div className="grid-container">
+              <div className="grid-header">Old Name</div>
+              <div className="grid-header">New Name</div>
+              <div className="grid-header"># Characters</div>
+              {this.state.modules.map((module, index) => {
+                return (
+                  <React.Fragment key={index}>
+                    <div>{module.title}</div>
+                    <div>
+                      <input
+                        type="text"
+                        onChange={this.changeTitle}
+                        name={index}
+                        value={module.new_title}
+                      />
+                    </div>
+                    <div>
+                      {module.new_title.length > 50 &&
+                      module.type === "Assignment" ? (
+                        <span className="long-name">
+                          {module.new_title.length}
+                        </span>
+                      ) : module.new_title.length > 50 &&
+                        module.type === "Quiz" ? (
+                        <span className="long-name">
+                          {module.new_title.length}
+                        </span>
+                      ) : module.new_title.length > 50 &&
+                        module.type === "Discussion" ? (
+                        <span className="long-name">
+                          {module.new_title.length}
+                        </span>
+                      ) : (
+                        module.new_title.length
+                      )}
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+            <button onClick={this.submitNames}>Save Names</button>
+          </>
+        )}
       </div>
     );
   }

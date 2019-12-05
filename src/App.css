@@ -200,7 +200,7 @@ form button,
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 2fr 2fr 0.5fr;
   grid-gap: 5px;
   max-width: 960px;
   width: 100%;
@@ -212,6 +212,10 @@ form button,
   border: 1px solid black;
   padding: 5px;
   text-align: left;
+}
+
+.grid-container div input {
+  width: 100%;
 }
 
 .grid-header {
@@ -290,4 +294,13 @@ fieldset[aria-busy="true"]::before {
 .course-id span {
   font-weight: bold;
   margin-right: 10px;
+}
+
+.long-name {
+  color: red;
+}
+
+.error-container {
+  border: 1px solid red;
+  padding: 15px;
 }
