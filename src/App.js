@@ -125,6 +125,14 @@ class App extends React.Component {
           json.splice(introIndex, 1);
         }
 
+        const infoIndex = json.findIndex(
+          module => module.name === "Course Information"
+        );
+
+        if (infoIndex !== -1) {
+          json.splice(infoIndex, 1);
+        }
+
         json.forEach((module, index) => {
           if (module.position - index > 1) {
             module.position = module.position - (module.position - index - 1);
