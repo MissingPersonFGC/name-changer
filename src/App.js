@@ -11,13 +11,11 @@ import { delay } from "q";
 
 class App extends React.Component {
   state = {
-    newModuleNames: [],
     modules: [],
     courses: [],
     selectedCourse: null,
     apiKey: "",
     success: false,
-    csvData: [],
     longNames: [],
     error: null,
     loading: false,
@@ -138,9 +136,17 @@ class App extends React.Component {
             module.position = module.position - (module.position - index - 1);
           }
 
-          module.items.forEach(item => {
+          module.items.forEach((item, index) => {
             item.module_name = module.name;
-            item.new_title = `${module.position}.${item.position} - ${item.title}`;
+            if (index < 9) {
+              item.new_title = `${module.position}.0${index + 1} - ${
+                item.title
+              }`;
+            } else {
+              item.new_title = `${module.position}.${index + 1} - ${
+                item.title
+              }`;
+            }
             modules.push(item);
           });
         });
