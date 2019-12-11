@@ -19,7 +19,8 @@ class App extends React.Component {
     longNames: [],
     error: null,
     loading: false,
-    loadMessage: null
+    loadMessage: null,
+    skipNumbering: false
   };
 
   changeState = e => {
@@ -79,6 +80,13 @@ class App extends React.Component {
     }
   };
 
+  omitNumbering = () => {
+    const { skipNumbering } = this.state;
+    this.setState({
+      skipNumbering: !skipNumbering
+    });
+  };
+
   pullModules = async e => {
     await this.setState({
       success: false,
@@ -86,7 +94,7 @@ class App extends React.Component {
       newModuleNames: []
     });
     const courseId = e.value;
-    const { apiKey } = this.state;
+    const { apiKey, skipNumbering } = this.state;
     await axios({
       method: "GET",
       url: `/api/modules`,
@@ -139,14 +147,18 @@ class App extends React.Component {
 
           module.items.forEach((item, index) => {
             item.module_name = module.name;
-            if (index < 9) {
-              item.new_title = `${module.position}.0${index + 1} - ${
-                item.title
-              }`;
+            if (!skipNumbering) {
+              if (index < 9) {
+                item.new_title = `${module.position}.0${index + 1} - ${
+                  item.title
+                }`;
+              } else {
+                item.new_title = `${module.position}.${index + 1} - ${
+                  item.title
+                }`;
+              }
             } else {
-              item.new_title = `${module.position}.${index + 1} - ${
-                item.title
-              }`;
+              item.new_title = item.title;
             }
             modules.push(item);
           });
@@ -266,15 +278,24 @@ class App extends React.Component {
           </fieldset>
         </form>
         {this.state.courses.length > 0 && (
-          <Select
-            options={this.state.courses.map(course => {
-              return {
-                value: course.id,
-                label: course.course_code
-              };
-            })}
-            onChange={this.pullModules}
-          />
+          <>
+            <input
+              type="checkbox"
+              name="skipNumbering"
+              onChange={this.omitNumbering}
+              value={this.state.skipNumbering}
+            />
+            <label htmlFor="skipNumbering">Skip automated numbering.</label>
+            <Select
+              options={this.state.courses.map(course => {
+                return {
+                  value: course.id,
+                  label: course.course_code
+                };
+              })}
+              onChange={this.pullModules}
+            />
+          </>
         )}
         {this.state.selectedCourse && (
           <p className="course-id">
