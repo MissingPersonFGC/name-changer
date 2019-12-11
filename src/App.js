@@ -56,6 +56,7 @@ class App extends React.Component {
       })
         .then(res => {
           const courses = res.data.data;
+          console.log(courses);
           this.setState({
             courses,
             loading: false,
@@ -164,6 +165,10 @@ class App extends React.Component {
   submitNames = async e => {
     e.preventDefault();
     const { modules, apiKey, selectedCourse: courseId } = this.state;
+    this.setState({
+      error: null,
+      longNames: []
+    });
     // Start long name check.
     const longNames = [];
     await modules.forEach(module => {
@@ -179,7 +184,7 @@ class App extends React.Component {
     });
     if (longNames.length === 0) {
       await this.setState({
-        error: false,
+        error: null,
         success: false,
         loading: true,
         loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`
@@ -206,6 +211,7 @@ class App extends React.Component {
                 })
                 .catch(e => {
                   error = true;
+                  console.log(e.res);
                 });
             }
             await delay(1000);

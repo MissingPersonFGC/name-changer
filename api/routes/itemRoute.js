@@ -28,6 +28,7 @@ router.route("/").put(async (req, res) => {
       });
     });
   } catch (e) {
+    res.status(401).send(e);
     console.log(e);
   }
 });
