@@ -23,7 +23,8 @@ class App extends React.Component {
     loadMessage: null,
     skipNumbering: false,
     location: null,
-    ipAddress: null
+    ipAddress: null,
+    addRespondus: false
   };
 
   changeState = e => {
@@ -171,13 +172,23 @@ class App extends React.Component {
             item.module_name = module.name;
             if (!skipNumbering) {
               if (index < 9) {
-                item.new_title = `${module.position}.0${index + 1} - ${
-                  item.title
-                }`;
+                if (this.state.addRespondus && module.type === "Quiz") {
+                  item.new_title = `${module.position}.0${index +
+                    1} - Requires Respondus Lockdown Browser`;
+                } else {
+                  item.new_title = `${module.position}.0${index + 1} - ${
+                    item.title
+                  }`;
+                }
               } else {
-                item.new_title = `${module.position}.${index + 1} - ${
-                  item.title
-                }`;
+                if (this.state.addRespondus && module.type === "Quiz") {
+                  item.new_title = `${module.position}.${index +
+                    1} - Requires Respondus Lockdown Browser`;
+                } else {
+                  item.new_title = `${module.position}.${index + 1} - ${
+                    item.title
+                  }`;
+                }
               }
             } else {
               item.new_title = item.title;
@@ -308,6 +319,15 @@ class App extends React.Component {
               value={this.state.skipNumbering}
             />
             <label htmlFor="skipNumbering">Skip automated numbering.</label>
+            <input
+              type="checkbox"
+              name="addRespondus"
+              onChange={this.setRespondus}
+              value={this.state.addRespondus}
+            />
+            <label htmlFor="skipNumbering">
+              Add Respondus Notice to Quizzes and Exams.
+            </label>
             <Select
               options={this.state.courses.map(course => {
                 return {
