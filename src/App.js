@@ -20,7 +20,9 @@ class App extends React.Component {
     error: null,
     loading: false,
     loadMessage: null,
-    skipNumbering: false
+    skipNumbering: false,
+    location: null,
+    ipAddress: null
   };
 
   changeState = e => {
@@ -39,6 +41,25 @@ class App extends React.Component {
       modules
     });
   };
+
+  async componentDidMount() {
+    await axios.get("http://ip-api.com/json/").then(res => {
+      const { city, regionName, country, query: ipAddress } = res.data;
+      if (!regionName || regionName === undefined) {
+        const location = `${city}, ${country}`;
+        this.setState({
+          ipAddress,
+          location
+        });
+      } else {
+        const location = `${city}, ${regionName}, ${country}`;
+        this.setState({
+          ipAddress,
+          location
+        });
+      }
+    });
+  }
 
   requestCourses = async e => {
     e.preventDefault();
