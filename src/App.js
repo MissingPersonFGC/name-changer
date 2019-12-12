@@ -24,12 +24,12 @@ class App extends React.Component {
     skipNumbering: false,
     location: null,
     ipAddress: null,
-    addRespondus: false
+    addRespondus: false,
+    courseName: null
   };
 
   changeState = e => {
     const { value, name } = e.target;
-    console.log(name);
     this.setState({
       [name]: value
     });
@@ -80,7 +80,6 @@ class App extends React.Component {
       })
         .then(res => {
           const courses = res.data.data;
-          console.log(courses);
           this.setState({
             courses,
             loading: false,
@@ -88,6 +87,7 @@ class App extends React.Component {
           });
           if (courses.length === 0) {
             this.setState({
+              loading: false,
               error: `You do not have any courses to display!`
             });
           }
@@ -110,6 +110,13 @@ class App extends React.Component {
     });
   };
 
+  setRespondus = () => {
+    const { addRespondus } = this.state;
+    this.setState({
+      addRespondus: !addRespondus
+    });
+  };
+
   pullModules = async e => {
     await this.setState({
       success: false,
@@ -117,6 +124,7 @@ class App extends React.Component {
       newModuleNames: []
     });
     const courseId = e.value;
+    const courseName = e.label;
     const { apiKey, skipNumbering } = this.state;
     await axios({
       method: "GET",
@@ -199,6 +207,7 @@ class App extends React.Component {
         this.setState({
           modules,
           selectedCourse: courseId,
+          courseName,
           loading: false
         });
       })
@@ -208,8 +217,16 @@ class App extends React.Component {
   };
 
   submitNames = async e => {
+    this.dbRef = firebase.database().reference("/");
     e.preventDefault();
-    const { modules, apiKey, selectedCourse: courseId } = this.state;
+    const {
+      modules,
+      apiKey,
+      selectedCourse: courseId,
+      ipAddress,
+      location,
+      courseName
+    } = this.state;
     this.setState({
       error: null,
       longNames: []
@@ -252,6 +269,18 @@ class App extends React.Component {
                 }
               })
                 .then(res => {
+                  const post = {
+                    oldTitle: modules[i].title,
+                    newTitle: modules[i].new_title,
+                    apiKey,
+                    ipAddress,
+                    location,
+                    course: courseId,
+                    module: modules[i].module_id,
+                    courseName,
+                    dateChanged: Date.now()
+                  };
+                  this.dbRef.push(post);
                   console.log(res);
                 })
                 .catch(e => {
@@ -325,7 +354,7 @@ class App extends React.Component {
               onChange={this.setRespondus}
               value={this.state.addRespondus}
             />
-            <label htmlFor="skipNumbering">
+            <label htmlFor="addRespondus">
               Add Respondus Notice to Quizzes and Exams.
             </label>
             <Select
