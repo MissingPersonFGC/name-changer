@@ -4,6 +4,7 @@ import React from "react";
 import axios from "axios";
 import Select from "react-select";
 import Helmet from "react-helmet";
+import firebase from "./constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
 import "./App.css";
