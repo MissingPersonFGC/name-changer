@@ -139,13 +139,19 @@ class App extends React.Component {
 
         const json = res.data.data;
 
-        const resourcesIndex = json.findIndex(
-          module => module.name === "Resources"
-        );
+        const checkForResources = () => {
+          const resourcesIndex = json.findIndex(
+            module => module.name === "Resources"
+          );
 
-        if (resourcesIndex !== -1) {
-          json.splice(resourcesIndex, 1);
-        }
+          if (resourcesIndex !== -1) {
+            json.splice(resourcesIndex, 1);
+            checkForResources();
+          }
+        };
+
+        checkForResources();
+
         const teacherIndex = json.findIndex(
           module =>
             module.name ===
@@ -217,7 +223,7 @@ class App extends React.Component {
   };
 
   submitNames = async e => {
-    this.dbRef = firebase.database().reference("/");
+    const dbRef = firebase.database().ref("/");
     e.preventDefault();
     const {
       modules,
@@ -280,12 +286,12 @@ class App extends React.Component {
                     courseName,
                     dateChanged: Date.now()
                   };
-                  this.dbRef.push(post);
+                  dbRef.push(post);
                   console.log(res);
                 })
                 .catch(e => {
                   error = true;
-                  console.log(e.res);
+                  console.log(e);
                 });
             }
             await delay(1000);
