@@ -14,7 +14,8 @@ class Tracker extends React.Component {
     error: null,
     itemsToManage: [],
     loading: false,
-    success: false
+    success: false,
+    selectAll: false
   };
 
   async componentDidMount() {
@@ -92,6 +93,35 @@ class Tracker extends React.Component {
     });
   };
 
+  selectAll = e => {
+    e.preventDefault();
+    const { items } = this.state;
+    const itemsToManage = [];
+    items.forEach(item => {
+      itemsToManage.push(item.key);
+    });
+    this.setState({
+      itemsToManage,
+      selectAll: true
+    });
+  };
+
+  deselectAll = e => {
+    e.preventDefault();
+    this.setState({
+      itemsToManage: [],
+      selectAll: false
+    });
+  };
+
+  undoChanges = async e => {
+    e.preventDefault();
+  };
+
+  deleteLogs = async e => {
+    e.preventDefault();
+  };
+
   render() {
     return (
       <div className="tracker">
@@ -137,6 +167,11 @@ class Tracker extends React.Component {
             <h1>Tracker</h1>
             <div className="management">
               <div>
+                {!this.state.selectAll ? (
+                  <button onClick={this.selectAll}>Select All</button>
+                ) : (
+                  <button onClick={this.deselectAll}>Deselect All</button>
+                )}
                 <button>
                   <FontAwesomeIcon icon={faUndo} /> Undo
                 </button>

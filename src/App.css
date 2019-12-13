@@ -198,7 +198,7 @@ form button,
   padding: 7.5px;
 }
 
-.management button:first-of-type {
+.management button {
   margin-right: 10px;
 }
 
