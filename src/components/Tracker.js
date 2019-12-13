@@ -78,11 +78,28 @@ class Tracker extends React.Component {
     });
   };
 
+  handleCheck = e => {
+    const { itemsToManage } = this.state;
+    const key = e.target.name;
+    if (itemsToManage.indexOf(key) === -1) {
+      itemsToManage.push(key);
+    } else {
+      const index = itemsToManage.indexOf(key);
+      itemsToManage.splice(index, 1);
+    }
+    this.setState({
+      itemsToManage
+    });
+  };
+
   render() {
     return (
       <div className="tracker">
         {!this.state.user ? (
           <>
+            <Helmet>
+              <title>Login: Name Changer</title>
+            </Helmet>
             <h1>Login</h1>
             <form onSubmit={this.doLogin}>
               <fieldset>
@@ -114,6 +131,9 @@ class Tracker extends React.Component {
           </>
         ) : (
           <>
+            <Helmet>
+              <title>Change Tracker: Name Changer</title>
+            </Helmet>
             <h1>Tracker</h1>
             <div className="management">
               <div>
