@@ -1,5 +1,5 @@
 import React from "react";
-import { firebase, auth } from "../constants/firebase";
+import firebase, { auth } from "../constants/firebase";
 import axios from "axios";
 import Helmet from "react-helmet";
 
@@ -8,13 +8,15 @@ class Tracker extends React.Component {
     email: "",
     password: "",
     user: null,
-    items: []
+    items: [],
+    error: null
   };
 
   async componentDidMount() {
     await auth.onAuthStateChanged(user => {
       if (user) {
         this.setState({ user });
+        this.getItems();
       }
     });
   }
@@ -28,9 +30,38 @@ class Tracker extends React.Component {
 
   doLogin = async e => {
     e.preventDefault();
+    this.setState({
+      loading: true,
+      error: null
+    });
+    const { email, password } = this.state;
+    await auth
+      .signInWithEmailAndPassword(email, password)
+      .then(success => {
+        const { user } = success;
+        this.setState({
+          loading: false,
+          user,
+          email: "",
+          password: ""
+        });
+        this.getItems();
+      })
+      .catch(err => {
+        const error = err.message;
+        this.setState({
+          loading: false,
+          error
+        });
+      });
   };
 
-  getItems = async () => {};
+  getItems = async () => {
+    const dbRef = firebase.database().ref("/");
+    dbRef.once("value", snapshot => {
+      console.log(snapshot.val());
+    });
+  };
 
   render() {
     return (
