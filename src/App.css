@@ -190,12 +190,16 @@ form input[type="text"] {
 }
 
 form button,
-.csv-download a {
+.management button {
   background: black;
   text-decoration: none;
   color: white;
   border: 0;
   padding: 7.5px;
+}
+
+.management button:first-of-type {
+  margin-right: 10px;
 }
 
 .grid-container {
@@ -314,4 +318,43 @@ fieldset[aria-busy="true"]::before {
 .login-container input,
 .login-container button {
   width: 100%;
+}
+
+.management {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.changed-items {
+  margin: 25px 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-gap: 10px;
+}
+
+.changed-items .item {
+  width: 100%;
+  border: 1px solid black;
+  padding: 5px 10px;
+  position: relative;
+}
+
+.changed-items .item p span {
+  font-weight: bold;
+}
+
+.changed-items .item p span.old {
+  color: red;
+}
+
+.changed-items .item p span.new {
+  color: green;
+}
+
+.checkbox {
+  position: absolute;
+  top: 10%;
+  right: 2%;
 }

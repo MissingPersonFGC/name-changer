@@ -1,5 +1,7 @@
 import React from "react";
 import firebase, { auth } from "../constants/firebase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faUndo } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import Helmet from "react-helmet";
 
@@ -9,7 +11,10 @@ class Tracker extends React.Component {
     password: "",
     user: null,
     items: [],
-    error: null
+    error: null,
+    itemsToManage: [],
+    loading: false,
+    success: false
   };
 
   async componentDidMount() {
@@ -63,7 +68,7 @@ class Tracker extends React.Component {
       const data = snapshot.val();
       for (let key in data) {
         items.push({
-          key,
+          key: key,
           ...data[key]
         });
       }
@@ -110,7 +115,40 @@ class Tracker extends React.Component {
         ) : (
           <>
             <h1>Tracker</h1>
-            <div className="changed-items"></div>
+            <div className="management">
+              <div>
+                <button>
+                  <FontAwesomeIcon icon={faUndo} /> Undo
+                </button>
+              </div>
+              <div>
+                <button>
+                  <FontAwesomeIcon icon={faTrash} /> Delete
+                </button>
+              </div>
+            </div>
+            <div className="changed-items">
+              {this.state.items.map(item => (
+                <div className="item" key={item.key}>
+                  <p>
+                    <span>Course:</span> {item.courseName}
+                  </p>
+                  <p>
+                    <span className="old">Old Item Title:</span> {item.oldTitle}
+                  </p>
+                  <p>
+                    <span className="new">New Item Title:</span> {item.newTitle}
+                  </p>
+                  <input
+                    type="checkbox"
+                    name={item.key}
+                    onChange={this.handleCheck}
+                    className="checkbox"
+                    checked={this.state.itemsToManage.indexOf(item.key) !== -1}
+                  />
+                </div>
+              ))}
+            </div>
           </>
         )}
       </div>
