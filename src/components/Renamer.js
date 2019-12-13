@@ -4,6 +4,7 @@ import React from "react";
 import axios from "axios";
 import Select from "react-select";
 import Helmet from "react-helmet";
+import { Link } from "react-router-dom";
 import firebase from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
@@ -327,6 +328,7 @@ class Renamer extends React.Component {
         <Helmet>
           <title>Course Module Name Changer</title>
         </Helmet>
+        <Link to="/tracker">Go to change tracker >></Link>
         <h1>Course Module Name Changer</h1>
         <form onSubmit={this.requestCourses}>
           <fieldset aria-busy={this.state.loading}>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import firebase, { auth } from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUndo } from "@fortawesome/free-solid-svg-icons";
@@ -195,6 +196,7 @@ class Tracker extends React.Component {
             <Helmet>
               <title>Login: Name Changer</title>
             </Helmet>
+            <Link to="/">{"<< Return to name changer"}</Link>
             <h1>Login</h1>
             {this.state.error && <p>{this.state.error}</p>}
             <form onSubmit={this.doLogin} disabled={this.state.loading}>
@@ -230,6 +232,7 @@ class Tracker extends React.Component {
             <Helmet>
               <title>Change Tracker: Name Changer</title>
             </Helmet>
+            <Link to="/">{"<< Return to name changer"}</Link>
             <h1>Tracker</h1>
             <fieldset aria-busy={this.state.loading}>
               {this.state.success && <p>Changes successfully made.</p>}

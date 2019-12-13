@@ -362,3 +362,9 @@ fieldset[aria-busy="true"]::before {
 .bottom {
   margin-bottom: 25px;
 }
+
+.renamer > a,
+.tracker > a {
+  color: black;
+  font-weight: bold;
+}
