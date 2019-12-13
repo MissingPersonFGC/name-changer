@@ -116,10 +116,15 @@ class Tracker extends React.Component {
 
   undoChanges = async e => {
     e.preventDefault();
+    const { items, itemsToManage } = this.state;
   };
 
   deleteLogs = async e => {
     e.preventDefault();
+    this.setState({
+      loading: true,
+      success: false
+    });
     const { itemsToManage, items } = this.state;
     const dbRef = firebase.database().ref("/");
     await itemsToManage.forEach(async item => {
@@ -131,7 +136,9 @@ class Tracker extends React.Component {
     });
     this.setState({
       items,
-      itemsToManage: []
+      itemsToManage: [],
+      loading: false,
+      success: true
     });
   };
 
@@ -144,8 +151,9 @@ class Tracker extends React.Component {
               <title>Login: Name Changer</title>
             </Helmet>
             <h1>Login</h1>
-            <form onSubmit={this.doLogin}>
-              <fieldset>
+            {this.state.error && <p>{this.state.error}</p>}
+            <form onSubmit={this.doLogin} disabled={this.state.loading}>
+              <fieldset aria-busy={this.state.loading}>
                 <div className="login-container">
                   <div>
                     <input
@@ -178,45 +186,52 @@ class Tracker extends React.Component {
               <title>Change Tracker: Name Changer</title>
             </Helmet>
             <h1>Tracker</h1>
-            <div className="management">
-              <div>
-                {!this.state.selectAll ? (
-                  <button onClick={this.selectAll}>Select All</button>
-                ) : (
-                  <button onClick={this.deselectAll}>Deselect All</button>
-                )}
-                <button>
-                  <FontAwesomeIcon icon={faUndo} /> Undo
-                </button>
-              </div>
-              <div>
-                <button>
-                  <FontAwesomeIcon icon={faTrash} /> Delete
-                </button>
-              </div>
-            </div>
-            <div className="changed-items">
-              {this.state.items.map(item => (
-                <div className="item" key={item.key}>
-                  <p>
-                    <span>Course:</span> {item.courseName}
-                  </p>
-                  <p>
-                    <span className="old">Old Item Title:</span> {item.oldTitle}
-                  </p>
-                  <p>
-                    <span className="new">New Item Title:</span> {item.newTitle}
-                  </p>
-                  <input
-                    type="checkbox"
-                    name={item.key}
-                    onChange={this.handleCheck}
-                    className="checkbox"
-                    checked={this.state.itemsToManage.indexOf(item.key) !== -1}
-                  />
+            <fieldset aria-busy={this.state.loading}>
+              {this.state.success && <p>Changes successfully made.</p>}
+              <div className="management">
+                <div>
+                  {!this.state.selectAll ? (
+                    <button onClick={this.selectAll}>Select All</button>
+                  ) : (
+                    <button onClick={this.deselectAll}>Deselect All</button>
+                  )}
+                  <button>
+                    <FontAwesomeIcon icon={faUndo} /> Undo
+                  </button>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <button>
+                    <FontAwesomeIcon icon={faTrash} /> Delete
+                  </button>
+                </div>
+              </div>
+              <div className="changed-items">
+                {this.state.items.map(item => (
+                  <div className="item" key={item.key}>
+                    <p>
+                      <span>Course:</span> {item.courseName}
+                    </p>
+                    <p>
+                      <span className="old">Old Item Title:</span>{" "}
+                      {item.oldTitle}
+                    </p>
+                    <p>
+                      <span className="new">New Item Title:</span>{" "}
+                      {item.newTitle}
+                    </p>
+                    <input
+                      type="checkbox"
+                      name={item.key}
+                      onChange={this.handleCheck}
+                      className="checkbox"
+                      checked={
+                        this.state.itemsToManage.indexOf(item.key) !== -1
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            </fieldset>
           </>
         )}
       </div>
