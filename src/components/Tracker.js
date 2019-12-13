@@ -120,6 +120,19 @@ class Tracker extends React.Component {
 
   deleteLogs = async e => {
     e.preventDefault();
+    const { itemsToManage, items } = this.state;
+    const dbRef = firebase.database().ref("/");
+    await itemsToManage.forEach(async item => {
+      await dbRef.child(item).once("value", () => {
+        dbRef.child(item).remove();
+      });
+      const index = items.findIndex(x => x.key === item);
+      items.splice(index, 1);
+    });
+    this.setState({
+      items,
+      itemsToManage: []
+    });
   };
 
   render() {
