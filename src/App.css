@@ -304,3 +304,14 @@ fieldset[aria-busy="true"]::before {
   border: 1px solid red;
   padding: 15px;
 }
+
+.login-container {
+  display: grid;
+  grid-template-columns: 5.5fr 5.5fr 1fr;
+  grid-gap: 20px;
+}
+
+.login-container input,
+.login-container button {
+  width: 100%;
+}
