@@ -59,7 +59,17 @@ class Tracker extends React.Component {
   getItems = async () => {
     const dbRef = firebase.database().ref("/");
     dbRef.once("value", snapshot => {
-      console.log(snapshot.val());
+      const items = [];
+      const data = snapshot.val();
+      for (let key in data) {
+        items.push({
+          key,
+          ...data[key]
+        });
+      }
+      this.setState({
+        items
+      });
     });
   };
 
@@ -98,7 +108,10 @@ class Tracker extends React.Component {
             </form>
           </>
         ) : (
-          <h1>Tracker</h1>
+          <>
+            <h1>Tracker</h1>
+            <div className="changed-items"></div>
+          </>
         )}
       </div>
     );
