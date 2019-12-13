@@ -231,7 +231,7 @@ label {
   margin-right: 10px;
 }
 
-.App > button {
+.renamer > button {
   width: 100%;
   padding: 7.5px;
   background: black;
@@ -357,4 +357,8 @@ fieldset[aria-busy="true"]::before {
   position: absolute;
   top: 10%;
   right: 2%;
+}
+
+.bottom {
+  margin-bottom: 25px;
 }

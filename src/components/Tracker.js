@@ -153,7 +153,8 @@ class Tracker extends React.Component {
       this.setState({
         success: true,
         loading: false,
-        error: null
+        error: null,
+        itemsToManage: []
       });
     } else {
       this.setState({
@@ -274,6 +275,23 @@ class Tracker extends React.Component {
                     />
                   </div>
                 ))}
+              </div>
+              <div className="management bottom">
+                <div>
+                  {!this.state.selectAll ? (
+                    <button onClick={this.selectAll}>Select All</button>
+                  ) : (
+                    <button onClick={this.deselectAll}>Deselect All</button>
+                  )}
+                  <button onClick={this.undoChanges}>
+                    <FontAwesomeIcon icon={faUndo} /> Undo
+                  </button>
+                </div>
+                <div>
+                  <button onClick={this.deleteLogs}>
+                    <FontAwesomeIcon icon={faTrash} /> Delete
+                  </button>
+                </div>
               </div>
             </fieldset>
           </>
