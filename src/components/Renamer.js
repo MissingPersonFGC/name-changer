@@ -283,6 +283,7 @@ class Renamer extends React.Component {
                     course: courseId,
                     module: modules[i].module_id,
                     courseName,
+                    item: modules[i].id,
                     dateChanged: Date.now()
                   };
                   dbRef.push(post);

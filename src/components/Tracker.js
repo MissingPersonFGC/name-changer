@@ -2,6 +2,7 @@ import React from "react";
 import firebase, { auth } from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { delay } from "q";
 import axios from "axios";
 import Helmet from "react-helmet";
 
@@ -117,6 +118,49 @@ class Tracker extends React.Component {
   undoChanges = async e => {
     e.preventDefault();
     const { items, itemsToManage } = this.state;
+    this.setState({
+      loading: true,
+      success: false,
+      error: null
+    });
+    let error = null;
+    itemsToManage.forEach(async item => {
+      if (!error) {
+        const index = items.findIndex(x => x.key === item);
+        const { oldTitle, apiKey, course, module, item: itemId } = items[index];
+        await axios({
+          method: "PUT",
+          url: encodeURI(`/api/item`),
+          data: {
+            apiKey,
+            newTitle: oldTitle,
+            moduleId: module,
+            itemId: itemId,
+            courseId: course
+          }
+        })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(e => {
+            error = true;
+            console.log(e);
+          });
+        await delay(1000);
+      }
+    });
+    if (!error) {
+      this.setState({
+        success: true,
+        loading: false,
+        error: null
+      });
+    } else {
+      this.setState({
+        loading: false,
+        error: "The request did not go through."
+      });
+    }
   };
 
   deleteLogs = async e => {
@@ -195,12 +239,12 @@ class Tracker extends React.Component {
                   ) : (
                     <button onClick={this.deselectAll}>Deselect All</button>
                   )}
-                  <button>
+                  <button onClick={this.undoChanges}>
                     <FontAwesomeIcon icon={faUndo} /> Undo
                   </button>
                 </div>
                 <div>
-                  <button>
+                  <button onClick={this.deleteLogs}>
                     <FontAwesomeIcon icon={faTrash} /> Delete
                   </button>
                 </div>
