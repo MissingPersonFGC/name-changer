@@ -124,7 +124,9 @@ class Tracker extends React.Component {
     const { items } = this.state;
     const itemsToManage = [];
     items.forEach(item => {
-      itemsToManage.push(item.key);
+      if (item.course === this.state.courseSearch) {
+        itemsToManage.push(item.key);
+      }
     });
     this.setState({
       itemsToManage,
