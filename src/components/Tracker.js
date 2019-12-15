@@ -6,6 +6,7 @@ import { faTrash, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { delay } from "q";
 import axios from "axios";
 import Helmet from "react-helmet";
+import Select from "react-select";
 
 class Tracker extends React.Component {
   state = {
@@ -17,7 +18,9 @@ class Tracker extends React.Component {
     itemsToManage: [],
     loading: false,
     success: false,
-    selectAll: false
+    selectAll: false,
+    courseSearch: "",
+    searchQueries: []
   };
 
   async componentDidMount() {
@@ -69,15 +72,36 @@ class Tracker extends React.Component {
     dbRef.once("value", snapshot => {
       const items = [];
       const data = snapshot.val();
+      const searchQueries = [];
       for (let key in data) {
         items.push({
           key: key,
           ...data[key]
         });
       }
-      this.setState({
-        items
+      items.forEach(item => {
+        const index = searchQueries.findIndex(
+          query => query.value === item.course
+        );
+        console.log(index);
+        if (index === -1) {
+          searchQueries.push({
+            label: item.courseName,
+            value: item.course
+          });
+        }
       });
+      this.setState({
+        items,
+        searchQueries
+      });
+    });
+  };
+
+  setSearch = e => {
+    const courseSearch = e.value;
+    this.setState({
+      courseSearch
     });
   };
 
@@ -236,66 +260,79 @@ class Tracker extends React.Component {
             <h1>Tracker</h1>
             <fieldset aria-busy={this.state.loading}>
               {this.state.success && <p>Changes successfully made.</p>}
-              <div className="management">
-                <div>
-                  {!this.state.selectAll ? (
-                    <button onClick={this.selectAll}>Select All</button>
-                  ) : (
-                    <button onClick={this.deselectAll}>Deselect All</button>
-                  )}
-                  <button onClick={this.undoChanges}>
-                    <FontAwesomeIcon icon={faUndo} /> Undo
-                  </button>
-                </div>
-                <div>
-                  <button onClick={this.deleteLogs}>
-                    <FontAwesomeIcon icon={faTrash} /> Delete
-                  </button>
-                </div>
-              </div>
-              <div className="changed-items">
-                {this.state.items.map(item => (
-                  <div className="item" key={item.key}>
-                    <p>
-                      <span>Course:</span> {item.courseName}
-                    </p>
-                    <p>
-                      <span className="old">Old Item Title:</span>{" "}
-                      {item.oldTitle}
-                    </p>
-                    <p>
-                      <span className="new">New Item Title:</span>{" "}
-                      {item.newTitle}
-                    </p>
-                    <input
-                      type="checkbox"
-                      name={item.key}
-                      onChange={this.handleCheck}
-                      className="checkbox"
-                      checked={
-                        this.state.itemsToManage.indexOf(item.key) !== -1
-                      }
-                    />
+              <Select
+                options={this.state.searchQueries}
+                onChange={this.setSearch}
+              />
+              {this.state.courseSearch !== "" && (
+                <>
+                  <div className="management">
+                    <div>
+                      {!this.state.selectAll ? (
+                        <button onClick={this.selectAll}>Select All</button>
+                      ) : (
+                        <button onClick={this.deselectAll}>Deselect All</button>
+                      )}
+                      <button onClick={this.undoChanges}>
+                        <FontAwesomeIcon icon={faUndo} /> Undo
+                      </button>
+                    </div>
+                    <div>
+                      <button onClick={this.deleteLogs}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete
+                      </button>
+                    </div>
                   </div>
-                ))}
-              </div>
-              <div className="management bottom">
-                <div>
-                  {!this.state.selectAll ? (
-                    <button onClick={this.selectAll}>Select All</button>
-                  ) : (
-                    <button onClick={this.deselectAll}>Deselect All</button>
-                  )}
-                  <button onClick={this.undoChanges}>
-                    <FontAwesomeIcon icon={faUndo} /> Undo
-                  </button>
-                </div>
-                <div>
-                  <button onClick={this.deleteLogs}>
-                    <FontAwesomeIcon icon={faTrash} /> Delete
-                  </button>
-                </div>
-              </div>
+                  <div className="changed-items">
+                    {this.state.items.map(item => {
+                      if (this.state.courseSearch === item.course) {
+                        return (
+                          <div className="item" key={item.key}>
+                            <p>
+                              <span>Course:</span> {item.courseName}
+                            </p>
+                            <p>
+                              <span className="old">Old Item Title:</span>{" "}
+                              {item.oldTitle}
+                            </p>
+                            <p>
+                              <span className="new">New Item Title:</span>{" "}
+                              {item.newTitle}
+                            </p>
+                            <input
+                              type="checkbox"
+                              name={item.key}
+                              onChange={this.handleCheck}
+                              className="checkbox"
+                              checked={
+                                this.state.itemsToManage.indexOf(item.key) !==
+                                -1
+                              }
+                            />
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                  <div className="management bottom">
+                    <div>
+                      {!this.state.selectAll ? (
+                        <button onClick={this.selectAll}>Select All</button>
+                      ) : (
+                        <button onClick={this.deselectAll}>Deselect All</button>
+                      )}
+                      <button onClick={this.undoChanges}>
+                        <FontAwesomeIcon icon={faUndo} /> Undo
+                      </button>
+                    </div>
+                    <div>
+                      <button onClick={this.deleteLogs}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </fieldset>
           </>
         )}

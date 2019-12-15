@@ -325,6 +325,7 @@ fieldset[aria-busy="true"]::before {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  margin-top: 25px;
 }
 
 .changed-items {
