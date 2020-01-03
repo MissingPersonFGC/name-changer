@@ -7,6 +7,7 @@ import { delay } from "q";
 import axios from "axios";
 import Helmet from "react-helmet";
 import Select from "react-select";
+import dateFormatter from "../services/dateFormatter";
 
 class Tracker extends React.Component {
   state = {
@@ -83,6 +84,7 @@ class Tracker extends React.Component {
         const index = searchQueries.findIndex(
           query => query.value === item.course
         );
+        item.dateChanged = dateFormatter(item.dateChanged);
         console.log(index);
         if (index === -1) {
           searchQueries.push({
@@ -290,6 +292,9 @@ class Tracker extends React.Component {
                       if (this.state.courseSearch === item.course) {
                         return (
                           <div className="item" key={item.key}>
+                            <p>
+                              <span>Date Changed:</span> {item.dateChanged}
+                            </p>
                             <p>
                               <span>Course:</span> {item.courseName}
                             </p>
