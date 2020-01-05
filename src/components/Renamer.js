@@ -34,6 +34,10 @@ class Renamer extends React.Component {
     this.setState({
       [name]: value
     });
+
+    if (name === "startingNumber" && this.state.selectedCourse) {
+      this.setModuleNames(this.state.modules);
+    }
   };
 
   changeTitle = e => {
