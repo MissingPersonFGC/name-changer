@@ -369,3 +369,9 @@ fieldset[aria-busy="true"]::before {
   color: black;
   font-weight: bold;
 }
+
+.notice {
+  font-weight: bold;
+  text-decoration: underline;
+  color: orange;
+}

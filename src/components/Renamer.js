@@ -25,7 +25,8 @@ class Renamer extends React.Component {
     location: null,
     ipAddress: null,
     addRespondus: false,
-    courseName: null
+    courseName: null,
+    startingNumber: 1
   };
 
   changeState = e => {
@@ -120,12 +121,11 @@ class Renamer extends React.Component {
   pullModules = async e => {
     await this.setState({
       success: false,
-      loading: true,
-      newModuleNames: []
+      loading: true
     });
     const courseId = e.value;
     const courseName = e.label;
-    const { apiKey, skipNumbering } = this.state;
+    const { apiKey } = this.state;
     await axios({
       method: "GET",
       url: `/api/modules`,
@@ -135,8 +135,6 @@ class Renamer extends React.Component {
       }
     })
       .then(res => {
-        const modules = [];
-
         const json = res.data.data;
 
         const checkForResources = () => {
@@ -177,41 +175,9 @@ class Renamer extends React.Component {
           json.splice(infoIndex, 1);
         }
 
-        json.forEach((module, index) => {
-          if (module.position - index > 1) {
-            module.position = module.position - (module.position - index - 1);
-          }
+        this.setModuleNames(json);
 
-          module.items.forEach((item, index) => {
-            item.module_name = module.name;
-            if (!skipNumbering) {
-              if (index < 9) {
-                if (this.state.addRespondus && module.type === "Quiz") {
-                  item.new_title = `${module.position}.0${index +
-                    1} - Requires Respondus Lockdown Browser`;
-                } else {
-                  item.new_title = `${module.position}.0${index + 1} - ${
-                    item.title
-                  }`;
-                }
-              } else {
-                if (this.state.addRespondus && module.type === "Quiz") {
-                  item.new_title = `${module.position}.${index +
-                    1} - Requires Respondus Lockdown Browser`;
-                } else {
-                  item.new_title = `${module.position}.${index + 1} - ${
-                    item.title
-                  }`;
-                }
-              }
-            } else {
-              item.new_title = item.title;
-            }
-            modules.push(item);
-          });
-        });
         this.setState({
-          modules,
           selectedCourse: courseId,
           courseName,
           loading: false
@@ -220,6 +186,47 @@ class Renamer extends React.Component {
       .catch(e => {
         console.log(e);
       });
+  };
+
+  setModuleNames = json => {
+    const modules = [];
+    let chapterNumber = Number(this.state.startingNumber);
+    const { skipNumbering } = this.state;
+    json.forEach(module => {
+      module.position = chapterNumber;
+      chapterNumber = chapterNumber + 1;
+
+      module.items.forEach((item, index) => {
+        item.module_name = module.name;
+        if (!skipNumbering) {
+          if (index < 9) {
+            if (this.state.addRespondus && module.type === "Quiz") {
+              item.new_title = `${module.position}.0${index +
+                1} - Requires Respondus Lockdown Browser`;
+            } else {
+              item.new_title = `${module.position}.0${index + 1} - ${
+                item.title
+              }`;
+            }
+          } else {
+            if (this.state.addRespondus && module.type === "Quiz") {
+              item.new_title = `${module.position}.${index +
+                1} - Requires Respondus Lockdown Browser`;
+            } else {
+              item.new_title = `${module.position}.${index + 1} - ${
+                item.title
+              }`;
+            }
+          }
+        } else {
+          item.new_title = item.title;
+        }
+        modules.push(item);
+      });
+    });
+    this.setState({
+      modules
+    });
   };
 
   submitNames = async e => {
@@ -365,6 +372,13 @@ class Renamer extends React.Component {
             <label htmlFor="addRespondus">
               Add Respondus Notice to Quizzes and Exams.
             </label>
+            <label htmlFor="startingNumber">Starting Chapter Number:</label>
+            <input
+              type="number"
+              name="startingNumber"
+              value={this.state.startingNumber}
+              onChange={this.changeState}
+            />
             <Select
               options={this.state.courses.map(course => {
                 return {
@@ -412,6 +426,10 @@ class Renamer extends React.Component {
               Here are the items with new names, please check them and change
               manually if necessary. Any assignment, quiz, or discussion with
               over 50 characters in the title MUST be renamed.
+            </p>
+            <p>
+              <span className="notice">Note:</span> You CANNOT use any special
+              characters (including &) in your names.
             </p>
             <div className="grid-container">
               <div className="grid-header">Old Name</div>
