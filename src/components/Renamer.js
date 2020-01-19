@@ -7,7 +7,7 @@ import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import firebase from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleDown } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleDown, faSync } from "@fortawesome/free-solid-svg-icons";
 import { delay } from "q";
 
 class Renamer extends React.Component {
@@ -23,10 +23,10 @@ class Renamer extends React.Component {
     loadMessage: null,
     skipNumbering: false,
     location: null,
-    ipAddress: null,
     addRespondus: false,
     courseName: null,
-    startingNumber: 1
+    startingNumber: 1,
+    removeNumbering: false
   };
 
   changeState = e => {
@@ -34,10 +34,6 @@ class Renamer extends React.Component {
     this.setState({
       [name]: value
     });
-
-    if (name === "startingNumber" && this.state.selectedCourse) {
-      this.setModuleNames(this.state.modules);
-    }
   };
 
   changeTitle = e => {
@@ -48,25 +44,6 @@ class Renamer extends React.Component {
       modules
     });
   };
-
-  async componentDidMount() {
-    await axios.get("http://ip-api.com/json/").then(res => {
-      const { city, regionName, country, query: ipAddress } = res.data;
-      if (!regionName || regionName === undefined) {
-        const location = `${city}, ${country}`;
-        this.setState({
-          ipAddress,
-          location
-        });
-      } else {
-        const location = `${city}, ${regionName}, ${country}`;
-        this.setState({
-          ipAddress,
-          location
-        });
-      }
-    });
-  }
 
   requestCourses = async e => {
     e.preventDefault();
@@ -122,6 +99,13 @@ class Renamer extends React.Component {
     });
   };
 
+  deleteNumbers = () => {
+    const { removeNumbering } = this.state;
+    this.setState({
+      removeNumbering: !removeNumbering
+    });
+  };
+
   pullModules = async e => {
     await this.setState({
       success: false,
@@ -171,6 +155,92 @@ class Renamer extends React.Component {
           json.splice(introIndex, 1);
         }
 
+        const introTwo = json.findIndex(
+          module => module.name === "Getting Started"
+        );
+
+        if (introTwo !== -1) {
+          json.splice(introTwo, 1);
+        }
+
+        const infoIndex = json.findIndex(
+          module => module.name === "Course Information"
+        );
+
+        if (infoIndex !== -1) {
+          json.splice(infoIndex, 1);
+        }
+
+        this.setModuleNames(json);
+
+        this.setState({
+          selectedCourse: courseId,
+          courseName,
+          loading: false
+        });
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  };
+
+  refreshCourse = async e => {
+    e.preventDefault();
+    await this.setState({
+      success: false,
+      loading: true
+    });
+    const { apiKey, selectedCourse: courseId, courseName } = this.state;
+    console.log(courseId);
+    await axios({
+      method: "GET",
+      url: `/api/modules`,
+      params: {
+        apiKey,
+        courseId
+      }
+    })
+      .then(res => {
+        const json = res.data.data;
+
+        const checkForResources = () => {
+          const resourcesIndex = json.findIndex(
+            module => module.name === "Resources"
+          );
+
+          if (resourcesIndex !== -1) {
+            json.splice(resourcesIndex, 1);
+            checkForResources();
+          }
+        };
+
+        checkForResources();
+
+        const teacherIndex = json.findIndex(
+          module =>
+            module.name ===
+            "Teacher Resources: How to teach and implement an eDL course successfully"
+        );
+
+        if (teacherIndex !== -1) {
+          json.splice(teacherIndex, 1);
+        }
+
+        const introIndex = json.findIndex(
+          module => module.name === "Getting Started: For students"
+        );
+        if (introIndex !== -1) {
+          json.splice(introIndex, 1);
+        }
+
+        const introTwo = json.findIndex(
+          module => module.name === "Getting Started"
+        );
+
+        if (introTwo !== -1) {
+          json.splice(introTwo, 1);
+        }
+
         const infoIndex = json.findIndex(
           module => module.name === "Course Information"
         );
@@ -195,13 +265,21 @@ class Renamer extends React.Component {
   setModuleNames = json => {
     const modules = [];
     let chapterNumber = Number(this.state.startingNumber);
-    const { skipNumbering } = this.state;
+    const { skipNumbering, removeNumbering } = this.state;
     json.forEach(module => {
       module.position = chapterNumber;
       chapterNumber = chapterNumber + 1;
 
       module.items.forEach((item, index) => {
         item.module_name = module.name;
+        if (removeNumbering) {
+          const firstLetterIndex = item.title.search(/[A-Za-z]/g);
+          item.title = item.title.substr(
+            firstLetterIndex,
+            item.title.length - 1
+          );
+          console.log(item.title);
+        }
         if (!skipNumbering) {
           if (index < 9) {
             if (this.state.addRespondus && module.type === "Quiz") {
@@ -240,7 +318,6 @@ class Renamer extends React.Component {
       modules,
       apiKey,
       selectedCourse: courseId,
-      ipAddress,
       location,
       courseName
     } = this.state;
@@ -290,7 +367,6 @@ class Renamer extends React.Component {
                     oldTitle: modules[i].title,
                     newTitle: modules[i].new_title,
                     apiKey,
-                    ipAddress,
                     location,
                     course: courseId,
                     module: modules[i].module_id,
@@ -360,29 +436,45 @@ class Renamer extends React.Component {
         </form>
         {this.state.courses.length > 0 && (
           <>
-            <input
-              type="checkbox"
-              name="skipNumbering"
-              onChange={this.omitNumbering}
-              value={this.state.skipNumbering}
-            />
-            <label htmlFor="skipNumbering">Skip automated numbering.</label>
-            <input
-              type="checkbox"
-              name="addRespondus"
-              onChange={this.setRespondus}
-              value={this.state.addRespondus}
-            />
-            <label htmlFor="addRespondus">
-              Add Respondus Notice to Quizzes and Exams.
-            </label>
-            <label htmlFor="startingNumber">Starting Chapter Number:</label>
-            <input
-              type="number"
-              name="startingNumber"
-              value={this.state.startingNumber}
-              onChange={this.changeState}
-            />
+            <div className="options">
+              <input
+                type="checkbox"
+                name="skipNumbering"
+                onChange={this.omitNumbering}
+                value={this.state.skipNumbering}
+              />
+              <label htmlFor="skipNumbering">Skip automated numbering.</label>
+              <input
+                type="checkbox"
+                name="removeNumbering"
+                onChange={this.deleteNumbers}
+                value={this.state.removeNumbering}
+              />
+              <label htmlFor="removeNumbering">
+                Remove existing numbering.
+              </label>
+              <input
+                type="checkbox"
+                name="addRespondus"
+                onChange={this.setRespondus}
+                value={this.state.addRespondus}
+              />
+              <label htmlFor="addRespondus">
+                Add Respondus Notice to Quizzes and Exams.
+              </label>
+            </div>
+            <div className="options">
+              <label htmlFor="startingNumber">Starting Chapter Number:</label>
+              <input
+                type="number"
+                name="startingNumber"
+                value={this.state.startingNumber}
+                onChange={this.changeState}
+              />
+              <button onClick={this.refreshCourse}>
+                <FontAwesomeIcon icon={faSync} /> Refresh Course
+              </button>
+            </div>
             <Select
               options={this.state.courses.map(course => {
                 return {

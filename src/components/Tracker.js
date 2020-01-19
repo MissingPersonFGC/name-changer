@@ -1,3 +1,5 @@
+// TODO: Add filter by date function.
+
 import React from "react";
 import { Link } from "react-router-dom";
 import firebase, { auth } from "../constants/firebase";
@@ -175,8 +177,8 @@ class Tracker extends React.Component {
             error = true;
             console.log(e);
           });
-        await delay(1000);
       }
+      await delay(1000);
     });
     if (!error) {
       this.setState({

@@ -180,7 +180,8 @@ form {
   margin-top: 25px;
 }
 
-form input[type="text"] {
+form input[type="text"],
+.options input[type="number"] {
   width: 70%;
   margin: 0 10px;
   padding: 5px;
@@ -189,8 +190,13 @@ form input[type="text"] {
   background: lightgrey;
 }
 
+.options input[type="number"] {
+  width: 50px;
+}
+
 form button,
-.management button {
+.management button,
+.options button {
   background: black;
   text-decoration: none;
   color: white;
@@ -374,4 +380,8 @@ fieldset[aria-busy="true"]::before {
   font-weight: bold;
   text-decoration: underline;
   color: orange;
+}
+
+.options {
+  margin: 20px 0px;
 }
