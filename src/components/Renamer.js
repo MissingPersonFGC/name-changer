@@ -23,7 +23,6 @@ class Renamer extends React.Component {
     loadMessage: null,
     skipNumbering: false,
     location: null,
-    addRespondus: false,
     courseName: null,
     startingNumber: 1,
     removeNumbering: false
@@ -89,13 +88,6 @@ class Renamer extends React.Component {
     const { skipNumbering } = this.state;
     this.setState({
       skipNumbering: !skipNumbering
-    });
-  };
-
-  setRespondus = () => {
-    const { addRespondus } = this.state;
-    this.setState({
-      addRespondus: !addRespondus
     });
   };
 
@@ -282,18 +274,20 @@ class Renamer extends React.Component {
         }
         if (!skipNumbering) {
           if (index < 9) {
-            if (this.state.addRespondus && module.type === "Quiz") {
-              item.new_title = `${module.position}.0${index +
-                1} - Requires Respondus Lockdown Browser`;
+            if (json.length > 9 && module.position < 10) {
+              item.new_title = `0${module.position}.0${index + 1} - ${
+                item.title
+              }`;
             } else {
               item.new_title = `${module.position}.0${index + 1} - ${
                 item.title
               }`;
             }
           } else {
-            if (this.state.addRespondus && module.type === "Quiz") {
-              item.new_title = `${module.position}.${index +
-                1} - Requires Respondus Lockdown Browser`;
+            if (json.length > 9 && module.position < 10) {
+              item.new_title = `0${module.position}.${index + 1} - ${
+                item.title
+              }`;
             } else {
               item.new_title = `${module.position}.${index + 1} - ${
                 item.title
@@ -452,15 +446,6 @@ class Renamer extends React.Component {
               />
               <label htmlFor="removeNumbering">
                 Remove existing numbering.
-              </label>
-              <input
-                type="checkbox"
-                name="addRespondus"
-                onChange={this.setRespondus}
-                value={this.state.addRespondus}
-              />
-              <label htmlFor="addRespondus">
-                Add Respondus Notice to Quizzes and Exams.
               </label>
             </div>
             <div className="options">
