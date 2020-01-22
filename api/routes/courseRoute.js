@@ -13,7 +13,8 @@ router.route("/").get(async (req, res) => {
       },
       params: {
         access_token,
-        per_page: 99999
+        per_page: 100,
+        state: ["available"]
       }
     }).then(result => {
       res.status(200).json({
