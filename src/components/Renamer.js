@@ -116,7 +116,6 @@ class Renamer extends React.Component {
     })
       .then(res => {
         const json = res.data.data;
-        console.log(json);
 
         const checkForResources = () => {
           const resourcesIndex = json.findIndex(
@@ -274,7 +273,27 @@ class Renamer extends React.Component {
           console.log(item.title);
         }
         if (!skipNumbering) {
-          if (index < 9) {
+          if (index < 9 && module.items.length < 100) {
+            if (json.length > 9 && module.position < 10) {
+              item.new_title = `0${module.position}.0${index + 1} - ${
+                item.title
+              }`;
+            } else {
+              item.new_title = `${module.position}.0${index + 1} - ${
+                item.title
+              }`;
+            }
+          } else if (index < 9 && module.items.length > 99) {
+            if (json.length > 9 && module.position < 10) {
+              item.new_title = `0${module.position}.00${index + 1} - ${
+                item.title
+              }`;
+            } else {
+              item.new_title = `${module.position}.00${index + 1} - ${
+                item.title
+              }`;
+            }
+          } else if (index > 8 && index < 99 && module.items.length > 99) {
             if (json.length > 9 && module.position < 10) {
               item.new_title = `0${module.position}.0${index + 1} - ${
                 item.title
