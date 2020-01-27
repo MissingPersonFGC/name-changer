@@ -116,6 +116,7 @@ class Renamer extends React.Component {
     })
       .then(res => {
         const json = res.data.data;
+        console.log(json);
 
         const checkForResources = () => {
           const resourcesIndex = json.findIndex(
