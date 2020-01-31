@@ -164,6 +164,7 @@ input::-moz-focus-inner {
 
 body {
   background: lightgrey;
+  position: relative;
 }
 
 .App {
@@ -384,4 +385,21 @@ fieldset[aria-busy="true"]::before {
 
 .options {
   margin: 20px 0px;
+}
+
+a[href="#to-top"], a[href="#to-bottom"] {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-buttons {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+}
+
+.nav-buttons div {
+  background: black;
+  padding: 10px 15px !important;
+  border: 1px solid white;
 }

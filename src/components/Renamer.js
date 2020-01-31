@@ -7,7 +7,7 @@ import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import firebase from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleDown, faSync } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleDown, faSync, faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import { delay } from "q";
 
 class Renamer extends React.Component {
@@ -25,8 +25,18 @@ class Renamer extends React.Component {
     location: null,
     courseName: null,
     startingNumber: 1,
-    removeNumbering: false
+    removeNumbering: false,
+    scroll: 0,
+    bottom: false
   };
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll, true);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  }
 
   changeState = e => {
     const { value, name } = e.target;
@@ -97,6 +107,26 @@ class Renamer extends React.Component {
       removeNumbering: !removeNumbering
     });
   };
+
+  handleScroll = () => {
+    const windowHeight = "innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight;
+    const body = document.body;
+    const html = document.documentElement;
+    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight,  html.scrollHeight, html.offsetHeight);
+    const windowBottom = windowHeight + window.pageYOffset;
+    this.setState({
+      scroll: window.scrollY
+    })
+    if (windowBottom >= docHeight) {
+     this.setState({
+       bottom: true
+     });
+   } else {
+     this.setState({
+       bottom: false
+     })
+   }
+  }
 
   pullModules = async e => {
     await this.setState({
@@ -426,6 +456,7 @@ class Renamer extends React.Component {
   render() {
     return (
       <div className="renamer">
+        <div id="to-top"></div>
         <Helmet>
           <title>Course Module Name Changer</title>
         </Helmet>
@@ -573,8 +604,25 @@ class Renamer extends React.Component {
               })}
             </div>
             <button onClick={this.submitNames}>Save Names</button>
+            <div className="nav-buttons">
+              {this.state.scroll > 0 && (
+                <a href="#to-top">
+                  <div className="top-button">
+                    <FontAwesomeIcon icon={faArrowUp} />
+                  </div>
+                </a>
+              )}
+              {!this.state.bottom && (
+                <a href="#to-bottom">
+                  <div className="bottom-button">
+                    <FontAwesomeIcon icon={faArrowDown} />
+                  </div>
+                </a>
+              )}
+            </div>
           </>
         )}
+        <div id="to-bottom"></div>
       </div>
     );
   }
