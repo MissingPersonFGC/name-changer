@@ -298,7 +298,7 @@ class Renamer extends React.Component {
           const firstLetterIndex = item.title.search(/[A-Za-z]/g);
           item.title = item.title.substr(
             firstLetterIndex,
-            item.title.length - 1
+            item.title.length
           );
           console.log(item.title);
         }
