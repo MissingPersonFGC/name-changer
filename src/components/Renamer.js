@@ -5,9 +5,14 @@ import axios from "axios";
 import Select from "react-select";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
-import firebase from "../constants/firebase";
+import firebase, { apiFirebase } from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleDown, faSync, faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleDoubleDown,
+  faSync,
+  faArrowUp,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
 import { delay } from "q";
 
 class Renamer extends React.Component {
@@ -27,37 +32,37 @@ class Renamer extends React.Component {
     startingNumber: 1,
     removeNumbering: false,
     scroll: 0,
-    bottom: false
+    bottom: false,
   };
 
   componentDidMount() {
-    window.addEventListener('scroll', this.handleScroll, true);
+    window.addEventListener("scroll", this.handleScroll, true);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener("scroll", this.handleScroll);
   }
 
-  changeState = e => {
+  changeState = (e) => {
     const { value, name } = e.target;
     this.setState({
-      [name]: value
+      [name]: value,
     });
   };
 
-  changeTitle = e => {
+  changeTitle = (e) => {
     const { name: index, value } = e.target;
     const { modules } = this.state;
     modules[index].new_title = value;
     this.setState({
-      modules
+      modules,
     });
   };
 
-  requestCourses = async e => {
+  requestCourses = async (e) => {
     e.preventDefault();
     await this.setState({
-      loading: true
+      loading: true,
     });
     let { apiKey } = this.state;
     apiKey.replace(" ", "");
@@ -66,30 +71,30 @@ class Renamer extends React.Component {
         method: "GET",
         url: "/api/courses",
         params: {
-          apiKey
-        }
+          apiKey,
+        },
       })
-        .then(res => {
+        .then((res) => {
           const courses = res.data.data;
           this.setState({
             courses,
             loading: false,
-            error: null
+            error: null,
           });
           if (courses.length === 0) {
             this.setState({
               loading: false,
-              error: `You do not have any courses to display!`
+              error: `You do not have any courses to display!`,
             });
           }
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     } else {
       this.setState({
         error: `You did not provide an API key.`,
-        loading: false
+        loading: false,
       });
     }
   };
@@ -97,41 +102,50 @@ class Renamer extends React.Component {
   omitNumbering = () => {
     const { skipNumbering } = this.state;
     this.setState({
-      skipNumbering: !skipNumbering
+      skipNumbering: !skipNumbering,
     });
   };
 
   deleteNumbers = () => {
     const { removeNumbering } = this.state;
     this.setState({
-      removeNumbering: !removeNumbering
+      removeNumbering: !removeNumbering,
     });
   };
 
   handleScroll = () => {
-    const windowHeight = "innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight;
+    const windowHeight =
+      "innerHeight" in window
+        ? window.innerHeight
+        : document.documentElement.offsetHeight;
     const body = document.body;
     const html = document.documentElement;
-    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight,  html.scrollHeight, html.offsetHeight);
+    const docHeight = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight
+    );
     const windowBottom = windowHeight + window.pageYOffset;
     this.setState({
-      scroll: window.scrollY
-    })
+      scroll: window.scrollY,
+    });
     if (windowBottom >= docHeight) {
-     this.setState({
-       bottom: true
-     });
-   } else {
-     this.setState({
-       bottom: false
-     })
-   }
-  }
+      this.setState({
+        bottom: true,
+      });
+    } else {
+      this.setState({
+        bottom: false,
+      });
+    }
+  };
 
-  pullModules = async e => {
+  pullModules = async (e) => {
     await this.setState({
       success: false,
-      loading: true
+      loading: true,
     });
     const courseId = e.value;
     const courseName = e.label;
@@ -141,15 +155,15 @@ class Renamer extends React.Component {
       url: `/api/modules`,
       params: {
         apiKey,
-        courseId
-      }
+        courseId,
+      },
     })
-      .then(res => {
+      .then((res) => {
         const json = res.data.data;
 
         const checkForResources = () => {
           const resourcesIndex = json.findIndex(
-            module => module.name === "Resources"
+            (module) => module.name === "Resources"
           );
 
           if (resourcesIndex !== -1) {
@@ -161,7 +175,7 @@ class Renamer extends React.Component {
         checkForResources();
 
         const teacherIndex = json.findIndex(
-          module =>
+          (module) =>
             module.name ===
             "Teacher Resources: How to teach and implement an eDL course successfully"
         );
@@ -171,14 +185,14 @@ class Renamer extends React.Component {
         }
 
         const introIndex = json.findIndex(
-          module => module.name === "Getting Started: For students"
+          (module) => module.name === "Getting Started: For students"
         );
         if (introIndex !== -1) {
           json.splice(introIndex, 1);
         }
 
         const introTwo = json.findIndex(
-          module => module.name === "Getting Started"
+          (module) => module.name === "Getting Started"
         );
 
         if (introTwo !== -1) {
@@ -186,7 +200,7 @@ class Renamer extends React.Component {
         }
 
         const infoIndex = json.findIndex(
-          module => module.name === "Course Information"
+          (module) => module.name === "Course Information"
         );
 
         if (infoIndex !== -1) {
@@ -198,19 +212,19 @@ class Renamer extends React.Component {
         this.setState({
           selectedCourse: courseId,
           courseName,
-          loading: false
+          loading: false,
         });
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   };
 
-  refreshCourse = async e => {
+  refreshCourse = async (e) => {
     e.preventDefault();
     await this.setState({
       success: false,
-      loading: true
+      loading: true,
     });
     const { apiKey, selectedCourse: courseId, courseName } = this.state;
     console.log(courseId);
@@ -219,15 +233,15 @@ class Renamer extends React.Component {
       url: `/api/modules`,
       params: {
         apiKey,
-        courseId
-      }
+        courseId,
+      },
     })
-      .then(res => {
+      .then((res) => {
         const json = res.data.data;
 
         const checkForResources = () => {
           const resourcesIndex = json.findIndex(
-            module => module.name === "Resources"
+            (module) => module.name === "Resources"
           );
 
           if (resourcesIndex !== -1) {
@@ -239,7 +253,7 @@ class Renamer extends React.Component {
         checkForResources();
 
         const teacherIndex = json.findIndex(
-          module =>
+          (module) =>
             module.name ===
             "Teacher Resources: How to teach and implement an eDL course successfully"
         );
@@ -249,14 +263,14 @@ class Renamer extends React.Component {
         }
 
         const introIndex = json.findIndex(
-          module => module.name === "Getting Started: For students"
+          (module) => module.name === "Getting Started: For students"
         );
         if (introIndex !== -1) {
           json.splice(introIndex, 1);
         }
 
         const introTwo = json.findIndex(
-          module => module.name === "Getting Started"
+          (module) => module.name === "Getting Started"
         );
 
         if (introTwo !== -1) {
@@ -264,7 +278,7 @@ class Renamer extends React.Component {
         }
 
         const infoIndex = json.findIndex(
-          module => module.name === "Course Information"
+          (module) => module.name === "Course Information"
         );
 
         if (infoIndex !== -1) {
@@ -276,19 +290,19 @@ class Renamer extends React.Component {
         this.setState({
           selectedCourse: courseId,
           courseName,
-          loading: false
+          loading: false,
         });
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e);
       });
   };
 
-  setModuleNames = json => {
+  setModuleNames = (json) => {
     const modules = [];
     let chapterNumber = Number(this.state.startingNumber);
     const { skipNumbering, removeNumbering } = this.state;
-    json.forEach(module => {
+    json.forEach((module) => {
       module.position = chapterNumber;
       chapterNumber = chapterNumber + 1;
 
@@ -296,10 +310,7 @@ class Renamer extends React.Component {
         item.module_name = module.name;
         if (removeNumbering) {
           const firstLetterIndex = item.title.search(/[A-Za-z]/g);
-          item.title = item.title.substr(
-            firstLetterIndex,
-            item.title.length
-          );
+          item.title = item.title.substr(firstLetterIndex, item.title.length);
           console.log(item.title);
         }
         if (!skipNumbering) {
@@ -351,11 +362,11 @@ class Renamer extends React.Component {
       });
     });
     this.setState({
-      modules
+      modules,
     });
   };
 
-  submitNames = async e => {
+  submitNames = async (e) => {
     const dbRef = firebase.database().ref("/");
     e.preventDefault();
     const {
@@ -363,15 +374,15 @@ class Renamer extends React.Component {
       apiKey,
       selectedCourse: courseId,
       location,
-      courseName
+      courseName,
     } = this.state;
     this.setState({
       error: null,
-      longNames: []
+      longNames: [],
     });
     // Start long name check.
     const longNames = [];
-    await modules.forEach(module => {
+    await modules.forEach((module) => {
       if (module.new_title.length > 50) {
         if (
           module.type === "Assignment" ||
@@ -387,7 +398,7 @@ class Renamer extends React.Component {
         error: null,
         success: false,
         loading: true,
-        loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`
+        loadMessage: `Please wait while the items are renamed. This may take 1-2 minutes.`,
       });
       let error = false;
 
@@ -403,10 +414,10 @@ class Renamer extends React.Component {
                   newTitle: modules[i].new_title,
                   moduleId: modules[i].module_id,
                   itemId: modules[i].id,
-                  courseId
-                }
+                  courseId,
+                },
               })
-                .then(res => {
+                .then((res) => {
                   const post = {
                     oldTitle: modules[i].title,
                     newTitle: modules[i].new_title,
@@ -416,12 +427,12 @@ class Renamer extends React.Component {
                     module: modules[i].module_id,
                     courseName,
                     item: modules[i].id,
-                    dateChanged: Date.now()
+                    dateChanged: Date.now(),
                   };
                   dbRef.push(post);
                   console.log(res);
                 })
-                .catch(e => {
+                .catch((e) => {
                   error = true;
                   console.log(e);
                 });
@@ -437,18 +448,18 @@ class Renamer extends React.Component {
           error: null,
           loading: false,
           modules: [],
-          newModuleNames: []
+          newModuleNames: [],
         });
       } else {
         this.setState({
           error: `The request did not go through.`,
-          loading: false
+          loading: false,
         });
       }
     } else {
       this.setState({
         error: `Some names are too long. Please correct the following names:`,
-        longNames
+        longNames,
       });
     }
   };
@@ -512,10 +523,10 @@ class Renamer extends React.Component {
               </button>
             </div>
             <Select
-              options={this.state.courses.map(course => {
+              options={this.state.courses.map((course) => {
                 return {
                   value: course.id,
-                  label: course.course_code
+                  label: course.course_code,
                 };
               })}
               onChange={this.pullModules}
@@ -538,7 +549,7 @@ class Renamer extends React.Component {
             </p>
             {this.state.longNames.length > 0 && (
               <ul>
-                {this.state.longNames.map(name => (
+                {this.state.longNames.map((name) => (
                   <li>
                     {name} ({name.length} characters)
                   </li>
