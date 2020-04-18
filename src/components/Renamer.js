@@ -489,18 +489,16 @@ class Renamer extends React.Component {
         <form onSubmit={this.requestCourses}>
           <fieldset aria-busy={this.state.loading}>
             <label htmlFor="apiKey">
-              Input your API Key:
-              <input
-                type="text"
-                name="apiKey"
-                value={this.state.apiKey}
-                onChange={this.changeState}
-                disabled={this.state.courses.length > 0}
+              Select Teacher:
+              <Select
+                options={this.state.teachers.map((teacher) => {
+                  return {
+                    label: `${teacher.lastName}, ${teacher.firstName}`,
+                    value: teacher.apiKey,
+                  };
+                })}
               />
             </label>
-            <button type="submit">
-              <FontAwesomeIcon icon={faAngleDoubleDown} /> Get Courses
-            </button>
           </fieldset>
         </form>
         {this.state.courses.length > 0 && (
