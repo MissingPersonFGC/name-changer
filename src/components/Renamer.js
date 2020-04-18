@@ -5,7 +5,8 @@ import axios from "axios";
 import Select from "react-select";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
-import firebase, { apiFirebase } from "../constants/firebase";
+import firebase from "../constants/firebase";
+import apiFirebase from "../constants/apiFirebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAngleDoubleDown,
@@ -33,7 +34,19 @@ class Renamer extends React.Component {
     removeNumbering: false,
     scroll: 0,
     bottom: false,
+    teachers: [],
   };
+
+  componentWillMount() {
+    const apiDbRef = apiFirebase.database().ref("/");
+    apiDbRef.once("value", (snapshot) => {
+      const teachers = snapshot.val();
+      teachers.sort((x, y) => x.lastName.localeCompare(y.lastName));
+      this.setState({
+        teachers,
+      });
+    });
+  }
 
   componentDidMount() {
     window.addEventListener("scroll", this.handleScroll, true);

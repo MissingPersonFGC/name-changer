@@ -10,6 +10,13 @@ class Login extends React.Component {
     error: null,
   };
 
+  changeState = (e) => {
+    const { name, value } = e.target;
+    this.setState({
+      [name]: value,
+    });
+  };
+
   doLogin = async (e) => {
     e.preventDefault();
     this.setState({
