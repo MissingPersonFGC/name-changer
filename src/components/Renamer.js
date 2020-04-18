@@ -73,12 +73,10 @@ class Renamer extends React.Component {
   };
 
   requestCourses = async (e) => {
-    e.preventDefault();
     await this.setState({
       loading: true,
     });
-    let { apiKey } = this.state;
-    apiKey.replace(" ", "");
+    const { value: apiKey } = e;
     if (apiKey.length > 0) {
       await axios({
         method: "GET",
@@ -93,6 +91,7 @@ class Renamer extends React.Component {
             courses,
             loading: false,
             error: null,
+            apiKey,
           });
           if (courses.length === 0) {
             this.setState({
@@ -497,6 +496,7 @@ class Renamer extends React.Component {
                     value: teacher.apiKey,
                   };
                 })}
+                onChange={this.requestCourses}
               />
             </label>
           </fieldset>
