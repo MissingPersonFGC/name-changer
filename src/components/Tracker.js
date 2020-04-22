@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import firebase from "../constants/firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faUndo } from "@fortawesome/free-solid-svg-icons";
-import { delay } from "q";
 import axios from "axios";
 import Helmet from "react-helmet";
 import Select from "react-select";
@@ -142,7 +141,6 @@ class Tracker extends React.Component {
             console.log(e);
           });
       }
-      await delay(1000);
     });
     if (!error) {
       this.setState({

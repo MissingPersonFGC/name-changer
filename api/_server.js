@@ -4,13 +4,13 @@ const http = require("http");
 
 const router = express();
 
-const middleWare = require("./middleware");
+const middleWare = require("./_middleware");
 
-const { applyMiddleware } = require("./utils");
+const { applyMiddleware } = require("./_utils");
 
-const { router: courseRouter } = require("./routes/courseRoute");
-const { router: moduleRouter } = require("./routes/moduleRoute");
-const { router: itemRouter } = require("./routes/itemRoute");
+const { router: courseRouter } = require("./_routes/courseRoute");
+const { router: moduleRouter } = require("./_routes/moduleRoute");
+const { router: itemRouter } = require("./_routes/itemRoute");
 
 // import routers above this line
 applyMiddleware(middleWare, router);

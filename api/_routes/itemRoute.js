@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const middleWare = require("../_middleware");
+const { applyMiddleware } = require("../_utils");
+
+applyMiddleware(middleWare, router);
 
 router.route("/").put(async (req, res) => {
   const {
@@ -8,23 +12,23 @@ router.route("/").put(async (req, res) => {
     courseId,
     itemId,
     moduleId,
-    newTitle: title
+    newTitle: title,
   } = req.body;
   try {
     await axios({
       method: "PUT",
       url: `https://canvas.instructure.com/api/v1/courses/${courseId}/modules/${moduleId}/items/${itemId}`,
       params: {
-        access_token
+        access_token,
       },
       data: {
         module_item: {
-          title
-        }
-      }
-    }).then(result => {
+          title,
+        },
+      },
+    }).then((result) => {
       res.status(201).json({
-        data: result.data
+        data: result.data,
       });
     });
   } catch (e) {

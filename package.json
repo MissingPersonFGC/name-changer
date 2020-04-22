@@ -29,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "nodemon api/server.js",
-    "all": "concurrently --kill-others \"nodemon api/server.js\" \"react-scripts start\""
+    "all": "concurrently --kill-others \"nodemon api/_server.js\" \"react-scripts start\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -46,5 +46,30 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:4000"
+  "proxy": "http://localhost:4000",
+  "now": {
+    "alias": "name-changer",
+    "name": "icad-name-changer",
+    "env": {
+      "PORT": "4000"
+    },
+    "routes": [
+      {
+        "src": "/",
+        "dest": "index.html"
+      },
+      {
+        "src": "/api/modules/(.+)",
+        "dest": "/api/modules.js"
+      },
+      {
+        "src": "/api/courses/(.+)",
+        "dest": "/api/courses.js"
+      },
+      {
+        "src": "/api/items/(.+)",
+        "dest": "/api/items.js"
+      }
+    ]
+  }
 }

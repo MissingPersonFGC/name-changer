@@ -9,12 +9,10 @@ import firebase from "../constants/firebase";
 import apiFirebase from "../constants/apiFirebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faAngleDoubleDown,
   faSync,
   faArrowUp,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { delay } from "q";
 
 class Renamer extends React.Component {
   state = {
@@ -420,7 +418,7 @@ class Renamer extends React.Component {
             if (modules[i].new_title.length > 0) {
               await axios({
                 method: "PUT",
-                url: encodeURI(`/api/item`),
+                url: encodeURI(`/api/items`),
                 data: {
                   apiKey,
                   newTitle: modules[i].new_title,
@@ -449,7 +447,6 @@ class Renamer extends React.Component {
                   console.log(e);
                 });
             }
-            await delay(1000);
           }
         }
       }

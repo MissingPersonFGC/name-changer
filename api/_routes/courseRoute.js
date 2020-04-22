@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const middleWare = require("../_middleware");
+const { applyMiddleware } = require("../_utils");
+
+applyMiddleware(middleWare, router);
 
 router.route("/").get(async (req, res) => {
   const { apiKey: access_token } = req.query;
@@ -9,16 +13,16 @@ router.route("/").get(async (req, res) => {
       method: "GET",
       url: "https://canvas.instructure.com/api/v1/courses",
       headers: {
-        Accept: "application/json+canvas-string-ids"
+        Accept: "application/json+canvas-string-ids",
       },
       params: {
         access_token,
         per_page: 100,
-        state: ["available"]
-      }
-    }).then(result => {
+        state: ["available"],
+      },
+    }).then((result) => {
       res.status(200).json({
-        data: [...result.data]
+        data: [...result.data],
       });
     });
   } catch (e) {

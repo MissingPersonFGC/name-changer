@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
+const middleWare = require("../_middleware");
+const { applyMiddleware } = require("../_utils");
+
+applyMiddleware(middleWare, router);
 
 router.route("/").get(async (req, res) => {
   const { apiKey: access_token, courseId } = req.query;
@@ -9,16 +13,16 @@ router.route("/").get(async (req, res) => {
       method: "GET",
       url: `https://canvas.instructure.com/api/v1/courses/${courseId}/modules`,
       headers: {
-        Accept: "application/json+canvas-string-ids"
+        Accept: "application/json+canvas-string-ids",
       },
       params: {
         access_token,
         per_page: 99999,
-        include: ["items", "content_details"]
-      }
+        include: ["items", "content_details"],
+      },
     });
     await Promise.all(
-      result.data.map(async unit => {
+      result.data.map(async (unit) => {
         if (unit.items_count > 100) {
           unit.items = [];
           let currentPage = 1;
@@ -29,15 +33,15 @@ router.route("/").get(async (req, res) => {
               method: "GET",
               url: `https://canvas.instructure.com/api/v1/courses/${courseId}/modules/${unit.id}/items`,
               headers: {
-                Accept: "application/json+canvas-string-ids"
+                Accept: "application/json+canvas-string-ids",
               },
               params: {
                 access_token,
                 per_page: 100,
-                page: currentPage
-              }
+                page: currentPage,
+              },
             });
-            itemRes.data.forEach(item => {
+            itemRes.data.forEach((item) => {
               unit.items.push(item);
             });
             if (currentPage < totalPages) {
@@ -51,7 +55,7 @@ router.route("/").get(async (req, res) => {
     );
 
     res.status(200).json({
-      data: result.data
+      data: result.data,
     });
   } catch (e) {
     res.status(400);
