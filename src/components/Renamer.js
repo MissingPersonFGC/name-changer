@@ -321,7 +321,6 @@ class Renamer extends React.Component {
         if (removeNumbering) {
           const firstLetterIndex = item.title.search(/[A-Za-z]/g);
           item.title = item.title.substr(firstLetterIndex, item.title.length);
-          console.log(item.title);
         }
         if (!skipNumbering) {
           if (index < 9 && module.items.length < 100) {
@@ -364,6 +363,9 @@ class Renamer extends React.Component {
                 item.title
               }`;
             }
+          }
+          if (item.type === "Assignment" || item.type === "Discussion") {
+            item.new_title = `${item.new_title} PZ`;
           }
         } else {
           item.new_title = item.title;
