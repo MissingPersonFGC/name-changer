@@ -28,7 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "nodemon api/server.js",
+    "server": "nodemon api/_server.js",
     "all": "concurrently --kill-others \"nodemon api/_server.js\" \"react-scripts start\""
   },
   "eslintConfig": {
