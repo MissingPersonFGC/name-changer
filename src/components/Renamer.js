@@ -381,6 +381,7 @@ class Renamer extends React.Component {
   submitNames = async (e) => {
     const dbRef = firebase.database().ref("/");
     e.preventDefault();
+    window.location.hash = "to-top";
     const {
       modules,
       apiKey,
