@@ -365,7 +365,7 @@ class Renamer extends React.Component {
             }
           }
           if (item.type === "Assignment" || item.type === "Discussion") {
-            item.new_title = `${item.new_title} PZ`;
+            item.new_title = `${item.new_title}-PZ`;
           }
         } else {
           item.new_title = item.title;
