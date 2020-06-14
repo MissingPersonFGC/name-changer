@@ -33,6 +33,7 @@ class Renamer extends React.Component {
     scroll: 0,
     bottom: false,
     teachers: [],
+    omitPz: false,
   };
 
   componentWillMount() {
@@ -67,6 +68,13 @@ class Renamer extends React.Component {
     modules[index].new_title = value;
     this.setState({
       modules,
+    });
+  };
+
+  omitPz = () => {
+    const { omitPz } = this.state;
+    this.setState({
+      omitPz: !omitPz,
     });
   };
 
@@ -368,7 +376,10 @@ class Renamer extends React.Component {
               }`;
             }
           }
-          if (item.type === "Assignment" || item.type === "Discussion") {
+          if (
+            !this.state.omitPz &&
+            (item.type === "Assignment" || item.type === "Discussion")
+          ) {
             item.new_title = `${item.new_title}-PZ`;
           }
         } else {
@@ -524,6 +535,13 @@ class Renamer extends React.Component {
               <label htmlFor="removeNumbering">
                 Remove existing numbering.
               </label>
+              <input
+                type="checkbox"
+                name="omitPz"
+                onChange={this.omitPz}
+                value={this.state.omitPz}
+              />
+              <label htmlFor="omitPz">Omit permanent zero labelling.</label>
             </div>
             <div className="options">
               <label htmlFor="startingNumber">Starting Chapter Number:</label>
