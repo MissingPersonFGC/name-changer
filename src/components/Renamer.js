@@ -73,6 +73,10 @@ class Renamer extends React.Component {
   requestCourses = async (e) => {
     await this.setState({
       loading: true,
+      skipNumbering: false,
+      startingNumber: 1,
+      removeNumbering: false,
+      selectedCourse: null,
     });
     const { value: apiKey } = e;
     if (apiKey.length > 0) {
