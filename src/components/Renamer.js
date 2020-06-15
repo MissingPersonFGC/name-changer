@@ -336,7 +336,10 @@ class Renamer extends React.Component {
         }
         if (!skipNumbering) {
           if (index < 9 && module.items.length < 100) {
-            if (json.length > 9 && module.position < 10) {
+            if (
+              json.length + (this.state.startingNumber - 1) > 9 &&
+              module.position < 10
+            ) {
               item.new_title = `0${module.position}.0${index + 1} - ${
                 item.title
               }`;
@@ -346,7 +349,10 @@ class Renamer extends React.Component {
               }`;
             }
           } else if (index < 9 && module.items.length > 99) {
-            if (json.length > 9 && module.position < 10) {
+            if (
+              json.length + (this.state.startingNumber - 1) > 9 &&
+              module.position < 10
+            ) {
               item.new_title = `0${module.position}.00${index + 1} - ${
                 item.title
               }`;
@@ -356,7 +362,10 @@ class Renamer extends React.Component {
               }`;
             }
           } else if (index > 8 && index < 99 && module.items.length > 99) {
-            if (json.length > 9 && module.position < 10) {
+            if (
+              json.length + (this.state.startingNumber - 1) > 9 &&
+              module.position < 10
+            ) {
               item.new_title = `0${module.position}.0${index + 1} - ${
                 item.title
               }`;
@@ -366,7 +375,10 @@ class Renamer extends React.Component {
               }`;
             }
           } else {
-            if (json.length > 9 && module.position < 10) {
+            if (
+              json.length + (this.state.startingNumber - 1) > 9 &&
+              module.position < 10
+            ) {
               item.new_title = `0${module.position}.${index + 1} - ${
                 item.title
               }`;
