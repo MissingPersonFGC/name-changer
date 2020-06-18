@@ -9,7 +9,8 @@ applyMiddleware(middleWare, router);
 router.route("/").get(async (req, res) => {
   const { apiKey: access_token } = req.query;
   try {
-    await axios({
+    const courses = [];
+    const result = await axios({
       method: "GET",
       url: "https://canvas.instructure.com/api/v1/courses",
       headers: {
@@ -18,12 +19,40 @@ router.route("/").get(async (req, res) => {
       params: {
         access_token,
         per_page: 100,
-        state: ["available"],
+        state: ["available", "unpublished"],
       },
-    }).then((result) => {
-      res.status(200).json({
-        data: [...result.data],
-      });
+    });
+    result.data.forEach((course) => {
+      courses.push(course);
+    });
+    if (result.data.length === 100) {
+      let currentPage = 2;
+      async function apiPagination() {
+        const courseRes = await axios({
+          method: "GET",
+          url: "https://canvas.instructure.com/api/v1/courses",
+          headers: {
+            Accept: "application/json+canvas-string-ids",
+          },
+          params: {
+            access_token,
+            per_page: 100,
+            state: ["available", "unpublished"],
+            page: currentPage,
+          },
+        });
+        courseRes.data.forEach((course) => {
+          courses.push(course);
+        });
+        if (courseRes.data.length === 100) {
+          currentPage += 1;
+          await apiPagination();
+        }
+      }
+      await apiPagination();
+    }
+    res.status(200).json({
+      data: [...courses],
     });
   } catch (e) {
     res.status(400);
