@@ -333,6 +333,8 @@ class Renamer extends React.Component {
         if (removeNumbering) {
           const firstLetterIndex = item.title.search(/[A-Za-z]/g);
           item.title = item.title.substr(firstLetterIndex, item.title.length);
+          // remove PZ designation if it's on an assignment
+          item.title = item.title.replace("-PZ", "");
         }
         if (!skipNumbering) {
           if (index < 9 && module.items.length < 100) {
