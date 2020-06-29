@@ -390,9 +390,14 @@ class Renamer extends React.Component {
               }`;
             }
           }
+          const ecIndex =
+            item.new_title.indexOf("Extra Credit") ||
+            item.new_title.indexOf("Bonus");
           if (
             !this.state.omitPz &&
-            (item.type === "Assignment" || item.type === "Discussion")
+            (item.type === "Assignment" ||
+              item.type === "Discussion" ||
+              ecIndex !== -1)
           ) {
             item.new_title = `${item.new_title}-PZ`;
           }
