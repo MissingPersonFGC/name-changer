@@ -20,6 +20,7 @@ router.route("/").get(async (req, res) => {
         access_token,
         per_page: 100,
         state: ["available", "unpublished"],
+				include: ["term"]
       },
     });
     result.data.forEach((course) => {
@@ -38,6 +39,7 @@ router.route("/").get(async (req, res) => {
             access_token,
             per_page: 100,
             state: ["available", "unpublished"],
+						include: ["term"],
             page: currentPage,
           },
         });

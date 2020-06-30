@@ -1,5 +1,3 @@
-// TODO: use CTA to explain app usage
-
 import React from "react";
 import axios from "axios";
 import Select from "react-select";
@@ -79,7 +77,7 @@ class Renamer extends React.Component {
   };
 
   requestCourses = async (e) => {
-    await this.setState({
+    this.setState({
       loading: true,
       skipNumbering: false,
       startingNumber: 1,
@@ -96,7 +94,11 @@ class Renamer extends React.Component {
         },
       })
         .then((res) => {
-          const courses = res.data.data;
+          const courses = [];
+					res.data.data.forEach(course => {
+						course.fullName = `${course.name} (${course.term.name})`;
+						courses.push(course);
+					});
           this.setState({
             courses,
             loading: false,
@@ -165,7 +167,7 @@ class Renamer extends React.Component {
   };
 
   pullModules = async (e) => {
-    await this.setState({
+    this.setState({
       success: false,
       loading: true,
     });
@@ -244,7 +246,7 @@ class Renamer extends React.Component {
 
   refreshCourse = async (e) => {
     e.preventDefault();
-    await this.setState({
+    this.setState({
       success: false,
       loading: true,
     });
@@ -429,7 +431,7 @@ class Renamer extends React.Component {
     });
     // Start long name check.
     const longNames = [];
-    await modules.forEach((module) => {
+    modules.forEach((module) => {
       if (module.new_title.length > 50) {
         if (
           module.type === "Assignment" ||
@@ -441,7 +443,7 @@ class Renamer extends React.Component {
       }
     });
     if (longNames.length === 0) {
-      await this.setState({
+      this.setState({
         error: null,
         success: false,
         loading: true,
@@ -517,7 +519,7 @@ class Renamer extends React.Component {
         <Helmet>
           <title>Course Module Name Changer</title>
         </Helmet>
-        <Link to="/tracker">Go to change tracker >></Link>
+        <Link to="/tracker">Go to change tracker {'>>'}</Link>
         <h1>Course Module Name Changer</h1>
         <form onSubmit={this.requestCourses}>
           <fieldset aria-busy={this.state.loading}>
@@ -578,7 +580,7 @@ class Renamer extends React.Component {
               options={this.state.courses.map((course) => {
                 return {
                   value: course.id,
-                  label: course.course_code,
+                  label: course.fullName,
                 };
               })}
               onChange={this.pullModules}
