@@ -31,7 +31,7 @@ class Renamer extends React.Component {
 		scroll: 0,
 		bottom: false,
 		teachers: [],
-		omitPz: false,
+		addPz: false,
 	};
 
 	componentWillMount() {
@@ -69,10 +69,10 @@ class Renamer extends React.Component {
 		});
 	};
 
-	omitPz = () => {
-		const { omitPz } = this.state;
+	addPz = () => {
+		const { addPz } = this.state;
 		this.setState({
-			omitPz: !omitPz,
+			addPz: !addPz,
 		});
 	};
 
@@ -336,8 +336,8 @@ class Renamer extends React.Component {
 					const firstLetterIndex = item.title.search(/[A-Za-z]/g);
 					item.title = item.title.substr(firstLetterIndex, item.title.length);
 					// remove PZ designation if it's on an assignment
-					item.title = item.title.replace("-PZ", "");
 				}
+				item.title = item.title.replace("-PZ", "");
 				if (!skipNumbering) {
 					if (index < 9 && module.items.length < 100) {
 						if (
@@ -401,9 +401,10 @@ class Renamer extends React.Component {
 				);
 				const ecTest = regExp.test(item.new_title);
 				if (
-					!this.state.omitPz &&
+					this.state.addPz &&
 					item.new_title.indexOf("-PZ") === -1 &&
-					(item.type === "Assignment" || item.type === "Discussion" || !ecTest)
+					!ecTest &&
+					(item.type === "Assignment" || item.type === "Discussion")
 				) {
 					item.new_title = `${item.new_title}-PZ`;
 				}
@@ -455,7 +456,10 @@ class Renamer extends React.Component {
 			async function putRequest() {
 				for (let i = 0; i < modules.length; i++) {
 					if (!error) {
-						if (modules[i].new_title.length > 0) {
+						if (
+							modules[i].new_title.length > 0 &&
+							modules[i].new_title !== modules[i].title
+						) {
 							await axios({
 								method: "PUT",
 								url: encodeURI(`/api/items`),
@@ -513,6 +517,59 @@ class Renamer extends React.Component {
 		}
 	};
 
+	createCSV = (e) => {
+		e.preventDefault();
+		const { modules, courseName } = this.state;
+		const longNames = [];
+		modules.forEach((module) => {
+			if (module.new_title.length > 50) {
+				if (
+					module.type === "Assignment" ||
+					module.type === "Quiz" ||
+					module.type === "Discussion"
+				) {
+					longNames.push(module.new_title);
+				}
+			}
+		});
+		if (longNames.length > 0) {
+			this.setState({
+				error: "Some names are too long. Please correct the following names:",
+				longNames,
+			});
+		}
+		if (longNames.length === 0) {
+			const csv = [["Old Name", "New Name"]];
+			modules.forEach((item) => {
+				const oldNameArr = [];
+				const newNameArr = [];
+				for (let i = 0; i < item.title.length; i += 1) {
+					if (item.title[i] !== "," && item.title[i] !== "#") {
+						oldNameArr.push(item.title[i]);
+					}
+				}
+				for (let i = 0; i < item.new_title.length; i += 1) {
+					if (item.new_title[i] !== "," && item.new_title[i] !== "#") {
+						newNameArr.push(item.new_title[i]);
+					}
+				}
+				const oldName = oldNameArr.join("");
+				const newName = newNameArr.join("");
+				const arr = [oldName, newName];
+				csv.push(arr);
+			});
+			let csvContent =
+				"data:text/csv;charset=utf-8," + csv.map((e) => e.join(",").join("\n"));
+			const encodedUri = encodeURI(csvContent);
+			const fileName = `${courseName} - Renaming`;
+			const link = document.createElement("a");
+			link.setAttribute("href", encodedUri);
+			link.setAttribute("download", `${fileName}.csv`);
+			document.body.appendChild(link);
+			link.click();
+		}
+	};
+
 	render() {
 		return (
 			<div className="renamer">
@@ -547,9 +604,7 @@ class Renamer extends React.Component {
 								onChange={this.omitNumbering}
 								value={this.state.skipNumbering}
 							/>
-							<label htmlFor="skipNumbering">
-								Skip automated numbering & add "-PZ" to end.
-							</label>
+							<label htmlFor="skipNumbering">Skip automated numbering.</label>
 							<input
 								type="checkbox"
 								name="removeNumbering"
@@ -562,10 +617,10 @@ class Renamer extends React.Component {
 							<input
 								type="checkbox"
 								name="omitPz"
-								onChange={this.omitPz}
-								value={this.state.omitPz}
+								onChange={this.addPz}
+								value={this.state.addPz}
 							/>
-							<label htmlFor="omitPz">Omit permanent zero labelling.</label>
+							<label htmlFor="addPz">Add permanent zero labelling.</label>
 						</div>
 						<div className="options">
 							<label htmlFor="startingNumber">Starting Chapter Number:</label>
@@ -672,6 +727,7 @@ class Renamer extends React.Component {
 							})}
 						</div>
 						<button onClick={this.submitNames}>Save Names</button>
+						<button onClick={this.createCSV}>Create CSV File</button>
 						<div className="nav-buttons">
 							{this.state.scroll > 0 && (
 								<a href="#to-top">
