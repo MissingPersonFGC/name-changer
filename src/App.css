@@ -9,397 +9,405 @@ hgroup,
 nav,
 section,
 summary {
-  display: block;
+	display: block;
 }
 audio,
 canvas,
 video {
-  display: inline-block;
+	display: inline-block;
 }
 audio:not([controls]) {
-  display: none;
-  height: 0;
+	display: none;
+	height: 0;
 }
 [hidden] {
-  display: none;
+	display: none;
 }
 html {
-  font-family: sans-serif;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
+	font-family: sans-serif;
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
 }
 a:focus {
-  outline: thin dotted;
+	outline: thin dotted;
 }
 a:active,
 a:hover {
-  outline: 0;
+	outline: 0;
 }
 h1 {
-  font-size: 2em;
+	font-size: 2em;
 }
 abbr[title] {
-  border-bottom: 1px dotted;
+	border-bottom: 1px dotted;
 }
 b,
 strong {
-  font-weight: 700;
+	font-weight: 700;
 }
 dfn {
-  font-style: italic;
+	font-style: italic;
 }
 mark {
-  background: #ff0;
-  color: #000;
+	background: #ff0;
+	color: #000;
 }
 code,
 kbd,
 pre,
 samp {
-  font-family: monospace, serif;
-  font-size: 1em;
+	font-family: monospace, serif;
+	font-size: 1em;
 }
 pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 q {
-  quotes: \201c \201d \2018 \2019;
+	quotes: \201c \201d \2018 \2019;
 }
 small {
-  font-size: 80%;
+	font-size: 80%;
 }
 sub,
 sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline;
 }
 sup {
-  top: -0.5em;
+	top: -0.5em;
 }
 sub {
-  bottom: -0.25em;
+	bottom: -0.25em;
 }
 img {
-  border: 0;
+	border: 0;
 }
 svg:not(:root) {
-  overflow: hidden;
+	overflow: hidden;
 }
 fieldset {
-  border: 1px solid silver;
-  margin: 0 2px;
-  padding: 0.35em 0.625em 0.75em;
+	border: 1px solid silver;
+	margin: 0 2px;
+	padding: 0.35em 0.625em 0.75em;
 }
 button,
 input,
 select,
 textarea {
-  font-family: inherit;
-  font-size: 100%;
-  margin: 0;
+	font-family: inherit;
+	font-size: 100%;
+	margin: 0;
 }
 button,
 input {
-  line-height: normal;
+	line-height: normal;
 }
 button,html input[type=button],/* 1 */input[type=reset],input[type=submit] {
-  -webkit-appearance: button;
-  cursor: pointer;
+	-webkit-appearance: button;
+	cursor: pointer;
 }
 button[disabled],
 input[disabled] {
-  cursor: default;
+	cursor: default;
 }
 input[type="checkbox"],
 input[type="radio"] {
-  box-sizing: border-box;
-  padding: 0;
+	box-sizing: border-box;
+	padding: 0;
 }
 input[type="search"] {
-  -webkit-appearance: textfield;
-  -moz-box-sizing: content-box;
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box;
+	-webkit-appearance: textfield;
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
 }
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-decoration {
-  -webkit-appearance: none;
+	-webkit-appearance: none;
 }
 textarea {
-  overflow: auto;
-  vertical-align: top;
+	overflow: auto;
+	vertical-align: top;
 }
 table {
-  border-collapse: collapse;
-  border-spacing: 0;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
 body,
 figure {
-  margin: 0;
+	margin: 0;
 }
 legend,
 button::-moz-focus-inner,
 input::-moz-focus-inner {
-  border: 0;
-  padding: 0;
+	border: 0;
+	padding: 0;
 }
 
 .clearfix:after {
-  visibility: hidden;
-  display: block;
-  font-size: 0;
-  content: "";
-  clear: both;
-  height: 0;
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: "";
+	clear: both;
+	height: 0;
 }
 
 * {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 body {
-  background: lightgrey;
-  position: relative;
+	background: lightgrey;
+	position: relative;
 }
 
 .App {
-  max-width: 960px;
-  width: 100%;
-  margin: auto;
+	max-width: 960px;
+	width: 100%;
+	margin: auto;
 }
 
 form {
-  margin-top: 30px;
+	margin-top: 30px;
 }
 
 .App > div {
-  margin-top: 25px;
+	margin-top: 25px;
 }
 
 form input[type="text"],
 .options input[type="number"] {
-  width: 70%;
-  margin: 0 10px;
-  padding: 5px;
-  border: 0;
-  border-bottom: 2px solid black;
-  background: lightgrey;
+	width: 70%;
+	margin: 0 10px;
+	padding: 5px;
+	border: 0;
+	border-bottom: 2px solid black;
+	background: lightgrey;
 }
 
 .options input[type="number"] {
-  width: 50px;
+	width: 50px;
 }
 
 form button,
 .management button,
 .options button {
-  background: black;
-  text-decoration: none;
-  color: white;
-  border: 0;
-  padding: 7.5px;
+	background: black;
+	text-decoration: none;
+	color: white;
+	border: 0;
+	padding: 7.5px;
 }
 
 .management button {
-  margin-right: 10px;
+	margin-right: 10px;
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: 2fr 2fr 0.5fr;
-  grid-gap: 5px;
-  max-width: 960px;
-  width: 100%;
-  margin: 0 auto;
+	display: grid;
+	grid-template-columns: 2fr 2fr 0.5fr;
+	grid-gap: 5px;
+	max-width: 960px;
+	width: 100%;
+	margin: 0 auto;
 }
 
 .grid-container div,
 .course-name-container div {
-  border: 1px solid black;
-  padding: 5px;
-  text-align: left;
+	border: 1px solid black;
+	padding: 5px;
+	text-align: left;
 }
 
 .grid-container div input {
-  width: 100%;
+	width: 100%;
 }
 
 .grid-header {
-  background: black;
-  color: white;
+	background: black;
+	color: white;
 }
 
 label {
-  margin-right: 10px;
+	margin-right: 10px;
 }
 
 .renamer > button {
-  width: 100%;
-  padding: 7.5px;
-  background: black;
-  color: white;
-  border: 0;
-  margin-top: 25px;
-  margin-bottom: 25px;
+	width: 100%;
+	padding: 7.5px;
+	background: black;
+	color: white;
+	border: 0;
+	margin-top: 25px;
+	margin-bottom: 25px;
 }
 
 .success {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 .success span {
-  color: green;
+	color: green;
 }
 
 svg {
-  margin-right: 5px;
+	margin-right: 5px;
 }
 
 .course-name-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  text-align: left;
-  grid-gap: 5px;
-  margin-bottom: 30px;
+	display: grid;
+	grid-template-columns: 1fr;
+	text-align: left;
+	grid-gap: 5px;
+	margin-bottom: 30px;
 }
 
 @keyframes loading {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 100% 100%;
-  }
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 100% 100%;
+	}
 }
 
 fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 
 fieldset::before {
-  height: 10px;
-  content: "";
-  display: block;
-  background-image: linear-gradient(to right, black 0%, white 50%, black 100%);
-  margin-bottom: 20px;
+	height: 10px;
+	content: "";
+	display: block;
+	background-image: linear-gradient(to right, black 0%, white 50%, black 100%);
+	margin-bottom: 20px;
 }
 
 fieldset[aria-busy="true"]::before {
-  background-size: 50% auto;
-  animation: loading 0.5s linear infinite;
+	background-size: 50% auto;
+	animation: loading 0.5s linear infinite;
 }
 
 .error span,
 .csv-download span {
-  font-weight: bold;
-  color: red;
+	font-weight: bold;
+	color: red;
 }
 
 .course-id span {
-  font-weight: bold;
-  margin-right: 10px;
+	font-weight: bold;
+	margin-right: 10px;
 }
 
 .long-name {
-  color: red;
+	color: red;
 }
 
 .error-container {
-  border: 1px solid red;
-  padding: 15px;
+	border: 1px solid red;
+	padding: 15px;
 }
 
 .login-container {
-  display: grid;
-  grid-template-columns: 5.5fr 5.5fr 1fr;
-  grid-gap: 20px;
+	display: grid;
+	grid-template-columns: 5.5fr 5.5fr 1fr;
+	grid-gap: 20px;
 }
 
 .login-container input,
 .login-container button {
-  width: 100%;
+	width: 100%;
 }
 
 .management {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  margin-top: 25px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	margin-top: 25px;
 }
 
 .changed-items {
-  margin: 25px 0;
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-gap: 10px;
+	margin: 25px 0;
+	display: grid;
+	grid-template-rows: 1fr;
+	grid-gap: 10px;
 }
 
 .changed-items .item {
-  width: 100%;
-  border: 1px solid black;
-  padding: 5px 10px;
-  position: relative;
+	width: 100%;
+	border: 1px solid black;
+	padding: 5px 10px;
+	position: relative;
 }
 
 .changed-items .item p span {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 .changed-items .item p span.old {
-  color: red;
+	color: red;
 }
 
 .changed-items .item p span.new {
-  color: green;
+	color: green;
 }
 
 .checkbox {
-  position: absolute;
-  top: 10%;
-  right: 2%;
+	position: absolute;
+	top: 10%;
+	right: 2%;
 }
 
 .bottom {
-  margin-bottom: 25px;
+	margin-bottom: 25px;
 }
 
 .renamer > a,
 .tracker > a {
-  color: black;
-  font-weight: bold;
+	color: black;
+	font-weight: bold;
 }
 
 .notice {
-  font-weight: bold;
-  text-decoration: underline;
-  color: orange;
+	font-weight: bold;
+	text-decoration: underline;
+	color: orange;
 }
 
 .options {
-  margin: 20px 0px;
+	margin: 20px 0px;
 }
 
-a[href="#to-top"], a[href="#to-bottom"] {
-  color: white;
-  text-decoration: none;
+a[href="#to-top"],
+a[href="#to-bottom"] {
+	color: white;
+	text-decoration: none;
 }
 
 .nav-buttons {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
+	position: fixed;
+	bottom: 15px;
+	right: 15px;
 }
 
 .nav-buttons div {
-  background: black;
-  padding: 10px 15px !important;
-  border: 1px solid white;
+	background: black;
+	padding: 10px 15px !important;
+	border: 1px solid white;
+}
+
+button.outlined {
+	background: none;
+	color: black;
+	border: 1px solid black;
+	margin-top: 0;
 }

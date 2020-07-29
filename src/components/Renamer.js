@@ -559,7 +559,7 @@ class Renamer extends React.Component {
 				csv.push(arr);
 			});
 			let csvContent =
-				"data:text/csv;charset=utf-8," + csv.map((e) => e.join(",").join("\n"));
+				"data:text/csv;charset=utf-8," + csv.map((e) => e.join(",")).join("\n");
 			const encodedUri = encodeURI(csvContent);
 			const fileName = `${courseName} - Renaming`;
 			const link = document.createElement("a");
@@ -727,7 +727,9 @@ class Renamer extends React.Component {
 							})}
 						</div>
 						<button onClick={this.submitNames}>Save Names</button>
-						<button onClick={this.createCSV}>Create CSV File</button>
+						<button className="outlined" onClick={this.createCSV}>
+							Create CSV File
+						</button>
 						<div className="nav-buttons">
 							{this.state.scroll > 0 && (
 								<a href="#to-top">
