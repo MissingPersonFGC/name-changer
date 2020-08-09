@@ -397,7 +397,7 @@ class Renamer extends React.Component {
 				}
 
 				const regExp = new RegExp(
-					/(Extra Credit|Bonus|Quiz|Test|Final|Midterm|Exam)/
+					/(Extra Credit|Bonus|Quiz|Test|Final|Midterm|Exam|Checkpoint|Workbook|Textbook Reading)/
 				);
 				const ecTest = regExp.test(item.new_title);
 				if (
