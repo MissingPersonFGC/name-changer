@@ -231,6 +231,17 @@ class Renamer extends React.Component {
 					json.splice(infoIndex, 1);
 				}
 
+				const midtermIndex = json.findIndex(
+					(module) => module.name === "Midterm"
+				);
+
+				if (midtermIndex !== -1) {
+					json[midtermIndex].items.forEach((item) => {
+						json[midtermIndex - 1].items.push(item);
+					});
+					json.splice(midtermIndex, 1);
+				}
+
 				this.setModuleNames(json);
 
 				this.setState({
@@ -307,6 +318,17 @@ class Renamer extends React.Component {
 
 				if (infoIndex !== -1) {
 					json.splice(infoIndex, 1);
+				}
+
+				const midtermIndex = json.findIndex(
+					(module) => module.name === "Midterm"
+				);
+
+				if (midtermIndex !== -1) {
+					json[midtermIndex].items.forEach((item) => {
+						json[midtermIndex - 1].items.push(item);
+					});
+					json.splice(midtermIndex, 1);
 				}
 
 				this.setModuleNames(json);
